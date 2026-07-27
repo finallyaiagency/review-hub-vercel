@@ -1,0 +1,5949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDE Chapter Review Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  :root {
+    --bg: #0a0a0f; --surface: #12121a; --surface2: #1a1a28;
+    --border: #2a2a3e; --text: #e8e8f0; --text2: #8888a0;
+    --accent: #6c5ce7; --accent2: #a29bfe;
+    --green: #00b894; --yellow: #fdcb6e; --red: #e17055;
+    --blue: #74b9ff; --pink: #fd79a8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    min-height: 100vh;
+  }
+  .header {
+    background: linear-gradient(135deg, var(--surface) 0%, #1a1a2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 1.5rem 1.5rem; text-align: center;
+  }
+  .header h1 {
+    font-size: 1.8rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent2), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem;
+  }
+  .header p { color: var(--text2); font-size: 0.9rem; }
+  .header .badge {
+    display: inline-block; margin-top: 0.5rem;
+    padding: 0.25rem 0.75rem; border-radius: 999px;
+    background: var(--accent); color: white;
+    font-size: 0.75rem; font-weight: 600;
+  }
+  .week-nav {
+    display: flex; gap: 0.5rem; padding: 1rem 1.5rem;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    overflow-x: auto; justify-content: center; flex-wrap: wrap;
+  }
+  .week-btn {
+    padding: 0.5rem 1rem; border-radius: 8px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text2); font-size: 0.8rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .week-btn:hover { border-color: var(--accent); color: var(--text); }
+  .week-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.5rem; padding: 1rem 1.5rem;
+  }
+  .day-btn {
+    padding: 0.6rem 0.8rem; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); font-size: 0.8rem; cursor: pointer;
+    transition: all 0.2s; text-align: left;
+  }
+  .day-btn:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
+  .day-btn.active { border-color: var(--accent); background: rgba(108,92,231,0.1); color: var(--accent2); }
+  .day-btn .day-num { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+  .day-btn .day-topic { font-size: 0.7rem; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .day-btn.completed { border-color: var(--green); background: rgba(0,184,148,0.1); }
+  .day-btn.completed .day-num::after { content: " ✓"; color: var(--green); }
+  .pace-bar { max-width: 1100px; margin: 1rem auto 0; padding: 0 1.5rem; }
+  .pace-meta { display: flex; justify-content: space-between; gap: 1rem; color: var(--text2); font-size: 0.78rem; margin-bottom: 0.4rem; }
+  .pace-track { height: 8px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .pace-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--green)); transition: width 0.25s ease; }
+  .complete-btn { margin-top: 0.8rem; border: 1px solid var(--border); border-radius: 8px; padding: 0.45rem 0.75rem; background: var(--surface); color: var(--text2); cursor: pointer; font: inherit; font-size: 0.78rem; }
+  .complete-btn:hover, .complete-btn.completed { border-color: var(--green); color: var(--green); }
+  .journal-panel { max-width: 1100px; margin: 1rem auto 0; padding: 0 1.5rem; }
+  .journal-panel summary { cursor: pointer; color: var(--accent2); font-size: 0.85rem; font-weight: 600; }
+  .journal-list { display: grid; gap: 0.5rem; margin-top: 0.75rem; }
+  .journal-item { padding: 0.65rem 0.8rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 0.78rem; }
+  .journal-item strong { color: var(--text); margin-right: 0.5rem; }
+  .journal-item span { color: var(--text2); }
+  .journal-entry { margin-top: 0.9rem; padding: 0.9rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(18,18,26,0.7); }
+  .journal-entry label { display: block; color: var(--accent2); font-size: 0.78rem; font-weight: 600; margin-bottom: 0.45rem; }
+  .journal-entry textarea { width: 100%; min-height: 74px; resize: vertical; border: 1px solid var(--border); border-radius: 7px; padding: 0.65rem; background: var(--bg); color: var(--text); font: inherit; font-size: 0.8rem; }
+  .journal-actions { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; }
+  .journal-save { border: 1px solid var(--accent); border-radius: 7px; padding: 0.4rem 0.7rem; background: var(--accent); color: white; cursor: pointer; font: inherit; font-size: 0.76rem; }
+  .journal-summary { color: var(--text2); font-size: 0.76rem; }
+  .dashboard-bar { max-width: 1100px; margin: 1rem auto 0; padding: 0 1.5rem; display: flex; gap: 0.65rem; align-items: center; flex-wrap: wrap; }
+  .dashboard-bar input { min-width: 150px; flex: 1; border: 1px solid var(--border); border-radius: 7px; padding: 0.5rem 0.65rem; background: var(--surface); color: var(--text); font: inherit; font-size: 0.8rem; }
+  .dashboard-btn { border: 1px solid var(--border); border-radius: 7px; padding: 0.5rem 0.7rem; background: var(--surface); color: var(--text2); cursor: pointer; font: inherit; font-size: 0.78rem; }
+  .dashboard-btn:hover, .dashboard-btn.active { border-color: var(--accent); color: var(--accent2); }
+  .dashboard-panel { max-width: 1100px; margin: 1rem auto 0; padding: 0 1.5rem; }
+  .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  .dashboard-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem; background: var(--surface); }
+  .dashboard-card small { display: block; color: var(--text2); font-size: 0.72rem; }
+  .dashboard-card strong { display: block; margin-top: 0.2rem; font-size: 1.25rem; color: var(--text); }
+  .dashboard-card p { margin-top: 0.25rem; color: var(--text2); font-size: 0.72rem; }
+  .tutor-box { margin-top: 0.75rem; border: 1px solid var(--accent); border-radius: 10px; padding: 0.9rem; background: rgba(108,92,231,0.08); }
+  .tutor-box h3 { color: var(--accent2); font-size: 0.85rem; }
+  .tutor-box p { color: var(--text2); font-size: 0.78rem; }
+  .tutor-box textarea { width: 100%; min-height: 54px; margin-top: 0.5rem; border: 1px solid var(--border); border-radius: 7px; padding: 0.6rem; background: var(--bg); color: var(--text); font: inherit; font-size: 0.78rem; }
+  .dashboard-hidden { display: none; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .day-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .day-header .week-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent2); font-weight: 600; }
+  .day-header h2 { font-size: 1.5rem; font-weight: 700; margin-top: 0.3rem; }
+  .day-header .progress { margin-top: 0.5rem; font-size: 0.8rem; color: var(--text2); }
+  .slides { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .slide { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: transform 0.2s, box-shadow 0.2s; }
+  .slide:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .slide .slide-num { font-size: 0.7rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .slide h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--accent2); }
+  .slide p, .slide li { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
+  .slide ul, .slide ol { padding-left: 1.2rem; }
+  .slide li { margin-bottom: 0.3rem; }
+  .slide code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: var(--surface2); padding: 0.1rem 0.4rem; border-radius: 4px; }
+  .slide pre { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; background: var(--surface2); padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 0.5rem 0; line-height: 1.5; border: 1px solid var(--border); white-space: pre-wrap; }
+  .slide table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 0.5rem 0; }
+  .slide th, .slide td { padding: 0.4rem 0.6rem; border: 1px solid var(--border); text-align: left; }
+  .slide th { background: var(--surface2); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .flashcards h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: var(--yellow); }
+  .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.8rem; }
+  .flashcard { perspective: 600px; height: 160px; cursor: pointer; }
+  .flashcard-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s ease; transform-style: preserve-3d; }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flashcard-front, .flashcard-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 12px; padding: 1rem; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid var(--border); }
+  .flashcard-front { background: var(--surface); font-size: 0.85rem; font-weight: 500; color: var(--text); }
+  .flashcard-front::before { content: "?"; position: absolute; top: 0.5rem; left: 0.7rem; font-size: 0.8rem; opacity: 0.5; }
+  .flashcard-back { background: linear-gradient(135deg, var(--surface2), #1a1a2e); transform: rotateY(180deg); font-size: 0.8rem; color: var(--accent2); line-height: 1.6; border-color: var(--accent); }
+  .flashcard-back::before { content: "\2713"; position: absolute; top: 0.5rem; left: 0.7rem; font-size: 0.8rem; color: var(--green); }
+  .exercise-box { background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(116,185,255,0.08)); border: 1px solid var(--accent); border-radius: 12px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+  .exercise-box h4 { color: var(--accent2); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+  .exercise-box p { font-size: 0.9rem; color: var(--text); }
+  @media (max-width: 600px) {
+    .slides { grid-template-columns: 1fr; }
+    .flashcard-grid { grid-template-columns: 1fr; }
+    .day-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    .header h1 { font-size: 1.3rem; }
+    .header { padding: 1.35rem 1rem 1rem; }
+    .week-nav { justify-content: flex-start; padding: 0.75rem 1rem; flex-wrap: nowrap; }
+    .day-grid { padding: 0.75rem 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .main { padding: 1.25rem 1rem 3rem; }
+    .slides { gap: 0.75rem; }
+    .slide { padding: 1rem; }
+    .pace-bar { padding: 0 1rem; }
+    .journal-panel { padding: 0 1rem; }
+    .dashboard-bar, .dashboard-panel { padding: 0 1rem; }
+    .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text2); }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>FDE Chapter Review Hub</h1>
+  <p>Forward Design Engineer — Review Hub &middot; Slides &amp; Flashcards</p>
+  <span class="badge">30 Chapters &middot; 4 Weeks &middot; 120+ Slides &middot; 150+ Flashcards</span>
+</div>
+<div class="dashboard-bar" aria-label="Tutor dashboard controls">
+  <input id="courseTitleInput" aria-label="Course title" value="FDE Chapter Review Hub">
+  <input id="courseSubjectInput" aria-label="Course subject" value="Forward Design Engineering">
+  <button class="dashboard-btn" type="button" onclick="saveCourseProfile()">Save course profile</button>
+  <button class="dashboard-btn active" type="button" onclick="showDashboardView('overview', this)">Overview</button>
+  <button class="dashboard-btn" type="button" onclick="showDashboardView('modules', this)">Modules</button>
+  <button class="dashboard-btn" type="button" onclick="showDashboardView('journal', this)">Journal</button>
+  <button class="dashboard-btn" type="button" onclick="showDashboardView('practice', this)">Practice</button>
+</div>
+<div class="dashboard-panel" id="dashboardPanel">
+  <div class="dashboard-grid">
+    <div class="dashboard-card"><small>Course progress</small><strong id="dashboardProgress">0%</strong><p id="dashboardProgressNote">0 of 30 chapters</p></div>
+    <div class="dashboard-card"><small>Current target</small><strong id="dashboardTarget">Chapter 1</strong><p id="dashboardTargetNote">Start here today</p></div>
+    <div class="dashboard-card"><small>Journal entries</small><strong id="dashboardJournal">0</strong><p>Saved chapter summaries</p></div>
+    <div class="dashboard-card"><small>Practice bank</small><strong id="dashboardPractice">0</strong><p>Flashcards in this course</p></div>
+  </div>
+  <div class="tutor-box">
+    <h3>Personal tutor focus</h3>
+    <p>Write what you want help with next. This stays with the course profile for your next study session.</p>
+    <textarea id="tutorFocus" placeholder="e.g. Help me understand retries with a concrete example..."></textarea>
+    <div class="journal-actions"><button class="journal-save" type="button" onclick="saveTutorFocus()">Save focus</button><span class="journal-summary" id="tutorFocusStatus"></span></div>
+  </div>
+</div>
+<div class="pace-bar" aria-label="Chapter completion and 30-day pacing">
+  <div class="pace-meta"><span id="paceLabel">0 of 30 chapters complete</span><span id="pacePercent">0% · Starting today</span></div>
+  <div class="pace-track"><div class="pace-fill" id="paceFill"></div></div>
+</div>
+<div class="week-nav" id="weekNav">
+
+  <button class="week-btn" onclick="showWeek(1)">Week 1: Build an Agent</button>
+
+  <button class="week-btn" onclick="showWeek(2)">Week 2: Make It Recoverable</button>
+
+  <button class="week-btn" onclick="showWeek(3)">Week 3: Make It Measurable</button>
+
+  <button class="week-btn" onclick="showWeek(4)">Week 4: Defend the System</button>
+
+</div>
+<div class="day-grid" id="dayGrid"></div>
+<details class="journal-panel" open>
+  <summary>Chapter journal overview</summary>
+  <div class="journal-list" id="journalList"><div class="journal-item"><span>No journal entries yet.</span></div></div>
+</details>
+<div class="main" id="mainContent">
+
+<div class="section" id="day1" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Chapter 1 of 30</div>
+
+    <h2>Agent Looping — The Core Loop</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Agent Loop</h3>
+
+      <p>The core loop: <b>Perceive → Reason → Act → Observe → Repeat</b></p>
+
+      <p>Unlike a single LLM call, an agent:</p>
+
+      <p>• Runs autonomously without hand-holding</p>
+
+      <p>• Iterates until the task is complete</p>
+
+      <p>• Doesn't need perfect prompting — it recovers</p>
+
+      <p>• Handles multi-step, multi-tool workflows</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Prompt vs Agent</h3>
+
+      <p>A prompt is a one-shot Q&A. An agent is a multi-step task engine.</p>
+
+      <table><tr><th>Prompt</th><th>Agent</th></tr>
+
+      <tr><td>One-shot Q&A</td><td>Multi-step task</td></tr>
+
+      <tr><td>Needs perfect input</td><td>Recovers from bad input</td></tr>
+
+      <tr><td>No memory</td><td>Maintains state</td></tr>
+
+      <tr><td>Single model call</td><td>Tool-calling loop</td></tr></table>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>The Loop in Practice</h3>
+
+      <p>1. <b>Perceive</b>: Receive task + current state</p>
+
+      <p>2. <b>Reason</b>: Decide what to do next</p>
+
+      <p>3. <b>Act</b>: Call a tool or generate output</p>
+
+      <p>4. <b>Observe</b>: See what happened</p>
+
+      <p>5. <b>Repeat</b>: Until task is done or max steps hit</p>
+
+      <br>
+
+      <p>Key: The agent decides when to stop, not the user.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Why This Matters for FDEs</h3>
+
+      <p>Clients don't need another chatbot. They need autonomous systems that:</p>
+
+      <p>• Process invoices while you sleep</p>
+
+      <p>• Handle 1,000 support tickets without fatigue</p>
+
+      <p>• Route leads 24/7 without supervision</p>
+
+      <br>
+
+      <p>The agent loop is the engine of every FDE deployment.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 2-min voice note: define the agent loop in your own words. What makes it different from a single LLM call?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the agent loop?</div>
+
+          <div class="flashcard-back">Perceive → Reason → Act → Observe → Repeat</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 3 things make an agent different from a prompt?</div>
+
+          <div class="flashcard-back">Runs autonomously, recovers from bad input, handles multi-step</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does the agent decide for itself?</div>
+
+          <div class="flashcard-back">When to stop — not the user</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the &#39;Observe&#39; step?</div>
+
+          <div class="flashcard-back">Seeing what happened after a tool call, feeding back into the loop</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why do clients need agents, not chatbots?</div>
+
+          <div class="flashcard-back">Agents work autonomously at scale without human supervision</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day2" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 2 of 30</div>
+
+    <h2>Tool Usage — Giving Your Agent Hands</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why Tools?</h3>
+
+      <p>An LLM alone can only generate text. To do real work, an agent needs:</p>
+
+      <p>🔧 <b>APIs</b> — Read/write external systems</p>
+
+      <p>🔧 <b>Databases</b> — Query and store data</p>
+
+      <p>🔧 <b>File System</b> — Read/write documents</p>
+
+      <p>🔧 <b>Web Search</b> — Fetch real-time info</p>
+
+      <p>🔧 <b>Email</b> — Send notifications</p>
+
+      <br>
+
+      <p>Tools = the agent's hands</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Tool Schema</h3>
+
+      <p>Every tool needs a defined schema:</p>
+
+      <pre>{
+  "name": "search_crm",
+  "description": "Search CRM for contact",
+  "parameters": {
+    "email": {"type": "string"},
+    "limit": {"type": "integer", "default": 5}
+  }
+}</pre>
+
+      <p>The model reads the schema and decides when to call it.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Tool Registry Pattern</h3>
+
+      <p>Tool Registry = a list of all available tools with their schemas.</p>
+
+      <p>1. Agent receives task</p>
+
+      <p>2. Model looks at tool registry</p>
+
+      <p>3. Model decides which tool(s) to call</p>
+
+      <p>4. System executes the tool</p>
+
+      <p>5. Result goes back into the loop</p>
+
+      <br>
+
+      <p>No hardcoded logic — the model routes dynamically.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>3 Tools for an Invoice Agent</h3>
+
+      <p>1. <b>search_vendor</b> — Look up vendor by name/ID in ERP</p>
+
+      <p>2. <b>extract_invoice_data</b> — Parse invoice PDF for amount, date, PO#</p>
+
+      <p>3. <b>match_po</b> — Compare invoice line items against purchase order</p>
+
+      <br>
+
+      <p>Each has a clear name, description, and parameter schema.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate 3 tools your agent would need for an enterprise workflow (e.g., invoice processing: search CRM, look up vendor, send email). How would each be defined?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does a tool schema define?</div>
+
+          <div class="flashcard-back">Name, description, and parameters with types</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is a Tool Registry?</div>
+
+          <div class="flashcard-back">A list of all available tools the agent can call</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Who decides which tool to call?</div>
+
+          <div class="flashcard-back">The model — it reads the registry and routes dynamically</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 3 tools an invoice agent needs</div>
+
+          <div class="flashcard-back">search_vendor, extract_invoice_data, match_po</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What happens after a tool executes?</div>
+
+          <div class="flashcard-back">Result feeds back into the agent loop — Observe → Reason</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day3" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 3 of 30</div>
+
+    <h2>Guardrails — Keeping Your Agent Safe</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why Guardrails?</h3>
+
+      <p>Without guardrails, your agent can:</p>
+
+      <p>❌ Hallucinate fake data into a client's CRM</p>
+
+      <p>❌ Leak PII (names, emails, financial data)</p>
+
+      <p>❌ Call expensive APIs in infinite loops</p>
+
+      <p>❌ Take destructive actions (delete, overwrite)</p>
+
+      <br>
+
+      <p>Guardrails transform a liability into a tool.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>3 Essential Guardrails</h3>
+
+      <p>1. <b>Output Validation</b> — Reject malformed JSON, check field types, enforce ranges</p>
+
+      <p>2. <b>Content Filtering</b> — Block PII, profanity, sensitive data from leaving the system</p>
+
+      <p>3. <b>Human-in-the-Loop</b> — Require approval for destructive actions (deletes, large payments, external sends)</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Rate Limiting & Budgets</h3>
+
+      <p>Agents can burn money fast if unchecked:</p>
+
+      <p>• Per-call cost cap: Max $0.50 per agent run</p>
+
+      <p>• Per-minute rate limit: 60 API calls/min</p>
+
+      <p>• Daily budget: $10/day per client</p>
+
+      <p>• Circuit breaker: Kill the agent if it enters a loop</p>
+
+      <br>
+
+      <p>These prevent runaway costs.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Guardrail Architecture</h3>
+
+      <pre>Input → Guardrail → Agent → Guardrail → Output
+       ↑                        ↓
+  Content Filter          Validation Check
+       ↑                        ↓
+  Blocked? → Reject        Failed? → Retry/Human</pre>
+
+      <p>Guardrails at both entry and exit points.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record 3 guardrails every production agent needs. What happens if you don't have them?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 3 essential guardrails</div>
+
+          <div class="flashcard-back">Output validation, content filtering, human-in-the-loop</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does output validation do?</div>
+
+          <div class="flashcard-back">Rejects malformed JSON, checks types, enforces ranges</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does content filtering block?</div>
+
+          <div class="flashcard-back">PII, profanity, sensitive data from leaving the system</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">When do you need human-in-the-loop?</div>
+
+          <div class="flashcard-back">Destructive actions: deletes, large payments, external sends</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is a circuit breaker for an agent?</div>
+
+          <div class="flashcard-back">Kills the agent if it loops or exceeds cost limits</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day4" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 4 of 30</div>
+
+    <h2>Context & Memory — Making Your Agent Remember</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Short-Term vs Long-Term Memory</h3>
+
+      <table><tr><th>Short-Term</th><th>Long-Term</th></tr>
+
+      <tr><td>Current conversation</td><td>Past sessions</td></tr>
+
+      <tr><td>In the prompt window</td><td>In a vector DB</td></tr>
+
+      <tr><td>Lost when session ends</td><td>Persists forever</td></tr>
+
+      <tr><td>Raw conversation history</td><td>Summaries + embeddings</td></tr>
+
+      <tr><td>Limited by context window</td><td>Virtually unlimited</td></tr></table>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Short-Term Memory in Practice</h3>
+
+      <p>The agent's context window contains:</p>
+
+      <p>• System prompt (instructions, rules)</p>
+
+      <p>• Conversation history (last N turns)</p>
+
+      <p>• Current task state</p>
+
+      <p>• Tool call results</p>
+
+      <br>
+
+      <p>Challenge: Context windows fill up. Strategy: Summarize older turns.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Long-Term Memory with RAG</h3>
+
+      <p>RAG = Retrieval Augmented Generation</p>
+
+      <p>1. Store past sessions as embeddings in a vector DB</p>
+
+      <p>2. When a new task arrives, retrieve relevant history</p>
+
+      <p>3. Inject it into the context window</p>
+
+      <p>4. Agent acts with full context</p>
+
+      <br>
+
+      <p>Example: An invoice agent remembers 'This vendor always sends late invoices'</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Invoice Agent Memory Example</h3>
+
+      <b>Across sessions, remembers:</b>
+
+      <p>• Vendor payment terms</p>
+
+      <p>• Preferred invoice formats</p>
+
+      <p>• Common discrepancy patterns</p>
+
+      <p>• Historical approval times</p>
+
+      <br>
+
+      <b>Current session, tracks:</b>
+
+      <p>• Which invoice is being processed</p>
+
+      <p>• What steps have been completed</p>
+
+      <p>• What data has been extracted</p>
+
+      <p>• What errors occurred</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate the difference between short-term and long-term memory. For an invoice agent, what should it remember across sessions?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is short-term memory?</div>
+
+          <div class="flashcard-back">Current conversation — in prompt window, lost when session ends</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is long-term memory?</div>
+
+          <div class="flashcard-back">Past sessions — stored in vector DB, persists forever</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does RAG stand for?</div>
+
+          <div class="flashcard-back">Retrieval Augmented Generation</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How does RAG work for memory?</div>
+
+          <div class="flashcard-back">Store sessions as embeddings, retrieve relevant history, inject into context</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the challenge with short-term memory?</div>
+
+          <div class="flashcard-back">Context windows fill up — summarize older turns</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day5" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 5 of 30</div>
+
+    <h2>Audit Trail — Show Your Work</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why Audit Trails?</h3>
+
+      <p>Clients fear the black box:</p>
+
+      <p>❌ 'What did the agent do?'</p>
+
+      <p>❌ 'Why did it make that decision?'</p>
+
+      <p>❌ 'Can we prove it followed the rules?'</p>
+
+      <br>
+
+      <p>Audit trails answer:</p>
+
+      <p>✅ Every step is logged</p>
+
+      <p>✅ Every decision is explainable</p>
+
+      <p>✅ Every action is verifiable</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>What to Log</h3>
+
+      <p>Every agent step must log:</p>
+
+      <p>1. <b>Timestamp</b> — When did it happen?</p>
+
+      <p>2. <b>Input</b> — What was the agent told?</p>
+
+      <p>3. <b>Reasoning</b> — Why did it choose this action?</p>
+
+      <p>4. <b>Tool Call</b> — What tool, with what params?</p>
+
+      <p>5. <b>Result</b> — What did the tool return?</p>
+
+      <p>6. <b>Decision</b> — What did the agent decide next?</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Audit Trail Format</h3>
+
+      <pre>{
+  "step": 3,
+  "timestamp": "2026-07-21T10:32:15Z",
+  "input": "Match invoice INV-442 to PO-889",
+  "reasoning": "Need to look up PO details",
+  "tool": "search_purchase_order",
+  "params": {"po_id": "PO-889"},
+  "result": {"status": "found", "total": 15000},
+  "next": "compare_line_items"
+}</pre>
+
+      <p>Every step is a JSON record.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Glass Box, Not Black Box</h3>
+
+      <p>With a full audit trail, you can:</p>
+
+      <p>• Replay the agent's entire decision process</p>
+
+      <p>• Debug failures by examining each step</p>
+
+      <p>• Prove compliance to auditors</p>
+
+      <p>• Build client trust by showing exactly what happened</p>
+
+      <br>
+
+      <p>This is your competitive advantage as an FDE.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record why audit trails matter for client trust. What would you log for every agent step?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 6 things should every step log?</div>
+
+          <div class="flashcard-back">Timestamp, Input, Reasoning, Tool Call, Result, Decision</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why do clients fear black-box agents?</div>
+
+          <div class="flashcard-back">Can&#39;t see what happened, why decisions made, or verify compliance</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is an audit trail?</div>
+
+          <div class="flashcard-back">Complete log of every agent step with timestamps, reasoning, results</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How does an audit trail build trust?</div>
+
+          <div class="flashcard-back">Clients can replay, debug, and verify every decision</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What format should audit trails use?</div>
+
+          <div class="flashcard-back">Structured JSON — one record per step</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day6" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 6 of 30</div>
+
+    <h2>Real Enterprise Workflow — Pick One, Map It</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>What Makes a Good Workflow?</h3>
+
+      <p>Ideal for AI automation:</p>
+
+      <p>• <b>High volume</b> — Happens 50+ times per week</p>
+
+      <p>• <b>Repetitive</b> — Same steps each time</p>
+
+      <p>• <b>Rules-based</b> — Clear decision criteria</p>
+
+      <p>• <b>Error-prone</b> — Humans make mistakes here</p>
+
+      <p>• <b>Painful</b> — Everyone hates doing it</p>
+
+      <br>
+
+      <p>If it checks 4/5, it's a great candidate.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>How to Map a Workflow</h3>
+
+      <p>1. <b>Identify the trigger</b> — What starts it? (email, form, ticket)</p>
+
+      <p>2. <b>List every step</b> — Who does what, in what order?</p>
+
+      <p>3. <b>Find the handoffs</b> — Where does it pass between people/systems?</p>
+
+      <p>4. <b>Document exceptions</b> — What goes wrong? How do they fix it?</p>
+
+      <p>5. <b>Measure the time</b> — How long does each step take?</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Example: Invoice Processing</h3>
+
+      <p>Trigger: Invoice email arrives</p>
+
+      <p>1. Open email attachment</p>
+
+      <p>2. Check if vendor is in system</p>
+
+      <p>3. Extract invoice number, date, amount, PO#</p>
+
+      <p>4. Match to purchase order</p>
+
+      <p>5. Check for discrepancies</p>
+
+      <p>6. Route for approval (if > $5K)</p>
+
+      <p>7. Post to accounting system</p>
+
+      <p>8. File the invoice</p>
+
+      <br>
+
+      <p>Exception: No PO → route to procurement</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Workflow Mapping Template</h3>
+
+      <b>Workflow:</b> ________________<br>
+
+      <b>Trigger:</b> ________________<br>
+
+      <b>Steps:</b><br>
+
+      <p>1. ___ → ___ min<br></p>
+
+      <p>2. ___ → ___ min<br></p>
+
+      <p>3. ___ → ___ min<br></p>
+
+      <b>Exceptions:</b><br>
+
+      <p>- If X fails → do Y<br></p>
+
+      <p>- If Z is missing → escalate to ___<br></p>
+
+      <b>Current time:</b> ___ min<br>
+
+      <b>Target time:</b> ___ min
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Pick a real workflow (expense reporting, lead routing, invoice processing). Dictate every step in detail. What are the inputs? Who does what? Where are the handoffs?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 5 criteria make a workflow good for AI?</div>
+
+          <div class="flashcard-back">High volume, repetitive, rules-based, error-prone, painful</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the first step in mapping a workflow?</div>
+
+          <div class="flashcard-back">Identify the trigger — what starts it?</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are handoffs in a workflow?</div>
+
+          <div class="flashcard-back">Where work passes between people or systems</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why document exceptions?</div>
+
+          <div class="flashcard-back">Happy path is a trap — exceptions are where real value is</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you measure in a workflow?</div>
+
+          <div class="flashcard-back">Time per step, total time, error rate, handoff count</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day7" data-week="1">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 1 &middot; Day 7 of 30</div>
+
+    <h2>🎉 CHECKPOINT — Working Agent Demo</h2>
+
+    <div class="progress">Week 1: Build an Agent</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Week 1 Checkpoint</h3>
+
+      <p>By Day 7, you should have:</p>
+
+      <p>✅ Agent loop — Perceive → Reason → Act → Observe</p>
+
+      <p>✅ Tool usage — At least 3 tools defined</p>
+
+      <p>✅ Guardrails — Output validation, content filtering, rate limits</p>
+
+      <p>✅ Memory — Short-term context management</p>
+
+      <p>✅ Audit trail — Every step logged</p>
+
+      <br>
+
+      <p>All for ONE real workflow task.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Demo Structure</h3>
+
+      <p>A good demo tells a story:</p>
+
+      <p>1. <b>The Problem</b> — What workflow did you pick? Why?</p>
+
+      <p>2. <b>The Architecture</b> — Loop, tools, guardrails, memory</p>
+
+      <p>3. <b>The Walkthrough</b> — Run it live. Show each step.</p>
+
+      <p>4. <b>The Audit Trail</b> — Show the logs. Prove it worked.</p>
+
+      <p>5. <b>The Rough Edges</b> — What's not perfect yet? Be honest.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>What Success Looks Like</h3>
+
+      <p>Success at Day 7 is NOT a perfect agent. It's:</p>
+
+      <p>• A working infrastructure you can build on</p>
+
+      <p>• Understanding of the agent loop fundamentals</p>
+
+      <p>• A real workflow mapped and partially automated</p>
+
+      <p>• Clear vision of what to improve in Week 2</p>
+
+      <br>
+
+      <p>Perfect is the enemy of done. Ship it.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Week 2 Preview</h3>
+
+      <p>Next week, you'll turn this demo into a system that can recover:</p>
+
+      <p>• JSON schemas instead of free-form text</p>
+
+      <p>• Schema validation to catch bad output</p>
+
+      <p>• Failure mode analysis</p>
+
+      <p>• Exception handling for every edge case</p>
+
+      <p>• Graceful degradation under pressure</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 3-min walkthrough of your agent. Show the loop, the tools, the guardrails, the memory, and the audit trail. What's working? What's still rough?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 5 things should your agent have by Day 7?</div>
+
+          <div class="flashcard-back">Loop, tools, guardrails, memory, audit trail</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the first thing to show in a demo?</div>
+
+          <div class="flashcard-back">The problem — what workflow did you pick and why?</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is success at Day 7?</div>
+
+          <div class="flashcard-back">A working infrastructure, not a perfect agent</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the theme of Week 2?</div>
+
+          <div class="flashcard-back">Turn the demo into a system that can recover</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you be honest about in your demo?</div>
+
+          <div class="flashcard-back">The rough edges — what&#39;s not perfect yet</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day8" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 8 of 30</div>
+
+    <h2>Defined JSON Schema — No Free-Form Text</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why JSON Schemas?</h3>
+
+      <p>Free-form text is fragile:</p>
+
+      <p>❌ Model can change format anytime</p>
+
+      <p>❌ Parsing breaks silently</p>
+
+      <p>❌ No validation — garbage in, garbage out</p>
+
+      <p>❌ Impossible to guarantee structure</p>
+
+      <br>
+
+      <p>JSON schemas fix this:</p>
+
+      <p>✅ Predictable structure</p>
+
+      <p>✅ Automatic validation</p>
+
+      <p>✅ Clear error messages</p>
+
+      <p>✅ Works with any model</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>JSON Schema Example</h3>
+
+      <pre>{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["invoice_id", "action"],
+  "properties": {
+    "invoice_id": {"type": "string", "pattern": "^INV-\\d+$"},
+    "action": {"type": "string", "enum": ["approve", "reject", "flag"]},
+    "amount": {"type": "number", "minimum": 0}
+  }
+}</pre>
+
+      <p>Every field has a type, format, and constraints.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Schema Benefits</h3>
+
+      <p>1. <b>Validation</b> — Reject bad output immediately</p>
+
+      <p>2. <b>Documentation</b> — Schema IS the contract</p>
+
+      <p>3. <b>Type Safety</b> — Strings stay strings, numbers stay numbers</p>
+
+      <p>4. <b>Tooling</b> — IDEs, CI/CD, and tests can validate automatically</p>
+
+      <p>5. <b>Versioning</b> — Track schema changes over time</p>
+
+      <br>
+
+      <p>No schema = no production.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Tool Schemas</h3>
+
+      <p>Every tool in your agent needs:</p>
+
+      <p>1. <b>Name</b> — snake_case, unique</p>
+
+      <p>2. <b>Description</b> — What does it do? When should the agent call it?</p>
+
+      <p>3. <b>Parameters</b> — JSON Schema for each parameter</p>
+
+      <p>4. <b>Returns</b> — What shape does the result have?</p>
+
+      <br>
+
+      <p>Go through your Week 1 tools and add schemas.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate the JSON schema for your agent's tool calls. What fields are required? What are the types? Why does this matter more than free-form text?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why is free-form text bad for production?</div>
+
+          <div class="flashcard-back">Format changes, parsing breaks silently, no validation</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does a JSON schema define?</div>
+
+          <div class="flashcard-back">Type, format, constraints, and required fields</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 4 things does every tool need?</div>
+
+          <div class="flashcard-back">Name, description, parameters schema, return type</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does schema validation give you?</div>
+
+          <div class="flashcard-back">Immediate rejection of bad output instead of silent failures</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is a schema enum?</div>
+
+          <div class="flashcard-back">Restricted set of allowed values (e.g. approve, reject, flag)</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day9" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 9 of 30</div>
+
+    <h2>Schema Validation — Reject Bad Output</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Validation Gate</h3>
+
+      <pre>Model Output → Parse JSON → Validate Schema → Pass → Continue
+                               ↓ Fail
+                    Log Error → Retry (max 3) → Fail → Escalate to Human</pre>
+
+      <p>Validation is a non-negotiable gate. Nothing passes without it.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>What Can Go Wrong?</h3>
+
+      <p>Common validation failures:</p>
+
+      <p>1. <b>Malformed JSON</b> — Missing bracket, trailing comma</p>
+
+      <p>2. <b>Missing fields</b> — Required field is null</p>
+
+      <p>3. <b>Wrong types</b> — String where number expected</p>
+
+      <p>4. <b>Out of range</b> — Amount is negative</p>
+
+      <p>5. <b>Invalid enum</b> — 'aprove' instead of 'approve'</p>
+
+      <br>
+
+      <p>Each needs a different recovery strategy.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Retry Strategy</h3>
+
+      <p>When validation fails:</p>
+
+      <p>1. <b>Retry 1</b> — 'Output failed validation. Correct and try again.'</p>
+
+      <p>2. <b>Retry 2</b> — 'Still invalid. Show the exact error.'</p>
+
+      <p>3. <b>Retry 3</b> — 'Use the fallback template.'</p>
+
+      <p>4. <b>Escalate</b> — 'Validation failed after 3 retries. Flagging for human review.'</p>
+
+      <br>
+
+      <p>Never retry forever. Set a budget.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Validation in Practice</h3>
+
+      <pre>from jsonschema import validate, ValidationError
+
+def safe_model_call(prompt, schema, max_retries=3):
+    for attempt in range(max_retries):
+        raw = model.generate(prompt)
+        try:
+            parsed = json.loads(raw)
+            validate(instance=parsed, schema=schema)
+            return parsed
+        except (json.JSONDecodeError, ValidationError) as e:
+            log_error(f"Attempt {attempt+1} failed: {e}")
+            prompt += f"\nError: {e}. Fix and retry."
+    escalate_to_human(raw)</pre>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record your validation strategy: what happens when the agent returns bad JSON? Walk through the rejection → retry → escalate flow.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What happens when validation fails?</div>
+
+          <div class="flashcard-back">Log error → retry (max 3) → escalate to human</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 3 common validation failures</div>
+
+          <div class="flashcard-back">Malformed JSON, missing fields, wrong types</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the retry strategy pattern?</div>
+
+          <div class="flashcard-back">Retry 1: gentle. Retry 2: show exact error. Retry 3: fallback. Then escalate.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the max retries before escalation?</div>
+
+          <div class="flashcard-back">3</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What Python library validates JSON schemas?</div>
+
+          <div class="flashcard-back">jsonschema — validate() + ValidationError</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day10" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 10 of 30</div>
+
+    <h2>Failure Modes — Plan for the 1,000 Ways Things Go Wrong</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Happy Path Trap</h3>
+
+      <p>Most engineers build for the happy path:</p>
+
+      <p>✅ Invoice arrives → Extract data → Match PO → Approve</p>
+
+      <br>
+
+      <p>Reality:</p>
+
+      <p>❌ Invoice arrives with no PO number</p>
+
+      <p>❌ Vendor isn't in the system</p>
+
+      <p>❌ Amount exceeds approval threshold</p>
+
+      <p>❌ PDF is scanned and unreadable</p>
+
+      <p>❌ Invoice is a credit note, not an invoice</p>
+
+      <br>
+
+      <p>Building for exceptions = competitive advantage.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>10 Failure Modes</h3>
+
+      <p>1. Missing data — PO#, vendor ID, date</p>
+
+      <p>2. Wrong data type — Text where number expected</p>
+
+      <p>3. API timeout — Downstream system is slow</p>
+
+      <p>4. Rate limited — Hit API quota</p>
+
+      <p>5. Auth failure — Credentials expired</p>
+
+      <p>6. Schema mismatch — Vendor changed their format</p>
+
+      <p>7. Duplicate — Invoice already processed</p>
+
+      <p>8. Out of range — Amount > $1M</p>
+
+      <p>9. Hallucination — Invented vendor name</p>
+
+      <p>10. Context overflow — Too many line items</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Failure Mode Documentation</h3>
+
+      <table><tr><th>Failure Mode</th><th>Detection</th><th>Recovery</th></tr>
+
+      <tr><td>Missing PO#</td><td>Schema validation</td><td>Flag for human</td></tr>
+
+      <tr><td>API timeout</td><td>> 5s response</td><td>Retry 3x, then queue</td></tr>
+
+      <tr><td>Rate limited</td><td>429 status</td><td>Exponential backoff</td></tr>
+
+      <tr><td>Duplicate</td><td>Check invoice ID</td><td>Return existing record</td></tr>
+
+      <tr><td>Hallucination</td><td>Cross-reference vendor DB</td><td>Reject, re-prompt</td></tr></table>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>The Failure Matrix</h3>
+
+      <p>Build a matrix for your agent:</p>
+
+      <p>1. List every step in your workflow</p>
+
+      <p>2. For each step, list 3-5 things that could go wrong</p>
+
+      <p>3. For each failure, define: detection, recovery, escalation</p>
+
+      <p>4. Test each failure mode</p>
+
+      <p>5. Iterate until recovery is smooth</p>
+
+      <br>
+
+      <p>This is your Week 2 deliverable.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate 10 failure modes for your agent. What could go wrong at each step? Missing data, wrong record, API down, rate limited, hallucinated output?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the happy path trap?</div>
+
+          <div class="flashcard-back">Building for the ideal case instead of the 1,000 ways things go wrong</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 5 of the 10 failure modes</div>
+
+          <div class="flashcard-back">Missing data, wrong type, API timeout, rate limited, duplicate</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the failure mode documentation format?</div>
+
+          <div class="flashcard-back">Failure Mode → Detection → Recovery</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the first step in building a failure matrix?</div>
+
+          <div class="flashcard-back">List every step in your workflow</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How do you test failure modes?</div>
+
+          <div class="flashcard-back">Simulate each failure, verify recovery, iterate until smooth</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day11" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 11 of 30</div>
+
+    <h2>Exception Handling — Build for Reality</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Client-Specific Exceptions</h3>
+
+      <p>Every client has unique exceptions:</p>
+
+      <p>Client A: 'Our PO numbers start with PO- and are 6 digits'</p>
+
+      <p>Client B: 'Sometimes we get invoices before the PO is issued'</p>
+
+      <p>Client C: 'Our vendors often send credit notes labeled as invoices'</p>
+
+      <br>
+
+      <p>These aren't in any SOP. You learn them by being on-site.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Recovery Hierarchy</h3>
+
+      <pre>Best:  Agent handles it automatically
+Good:  Agent flags it with a clear message
+Okay:  Agent routes to the right human
+Worst: Agent fails silently (data corruption, double payment)</pre>
+
+      <p>Design for the best. Always avoid the worst.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Exception Handling Patterns</h3>
+
+      <p>1. <b>Retry</b> — Transient failure (timeout, rate limit)</p>
+
+      <p>2. <b>Fallback</b> — Alternative model, tool, or data source</p>
+
+      <p>3. <b>Skip</b> — Optional step, can proceed without it</p>
+
+      <p>4. <b>Flag</b> — Document and continue, human reviews later</p>
+
+      <p>5. <b>Halt</b> — Stop processing, escalate immediately</p>
+
+      <br>
+
+      <p>Choose the right pattern for each failure mode.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Workshop: Your Recovery Paths</h3>
+
+      <p>Take your 10 failure modes from Day 10.</p>
+
+      <p>For each one, dictate:</p>
+
+      <p>1. How do you detect it?</p>
+
+      <p>2. What's the recovery pattern? (retry/fallback/skip/flag/halt)</p>
+
+      <p>3. What does the agent tell the user?</p>
+
+      <p>4. What's logged?</p>
+
+      <br>
+
+      <p>Example: Missing PO# → Flag → 'Invoice has no PO, routing to procurement' → Log as exception</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Take your workflow from Day 6. For each of the 10 failure modes from Day 10, dictate how your agent should handle it. What's the recovery path?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are client-specific exceptions?</div>
+
+          <div class="flashcard-back">Unique edge cases found only when you&#39;re on-site with a client</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name the 4 recovery patterns from best to worst</div>
+
+          <div class="flashcard-back">Handle → Flag → Route → Fail silently</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 5 exception handling patterns</div>
+
+          <div class="flashcard-back">Retry, Fallback, Skip, Flag, Halt</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What pattern for transient failures?</div>
+
+          <div class="flashcard-back">Retry (timeout, rate limit)</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What pattern for critical failures?</div>
+
+          <div class="flashcard-back">Halt — stop processing, escalate immediately</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day12" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 12 of 30</div>
+
+    <h2>Deep Dive: Client Context & Exception Handling</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why On-Site Matters</h3>
+
+      <p>McKinsey consultants sit in coal mines with miners. Palantir FDEs sit in government offices.</p>
+
+      <p>Because you learn more in 1 hour of watching than 10 hours of interviews:</p>
+
+      <p>• The workarounds people build</p>
+
+      <p>• The exceptions they handle instinctively</p>
+
+      <p>• The tools they actually use (not what's on the org chart)</p>
+
+      <p>• The relationships and politics that affect process</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Observation Protocol</h3>
+
+      <p>1. <b>Shadow</b> — Follow someone for a full day. Don't interrupt.</p>
+
+      <p>2. <b>Ask 'Show me'</b> — Not 'What do you do?' but 'Can you show me?'</p>
+
+      <p>3. <b>Document everything</b> — Write down every workaround, every manual step</p>
+
+      <p>4. <b>Find the pain</b> — What makes people sigh? What do they dread?</p>
+
+      <p>5. <b>Map the exceptions</b> — What goes wrong weekly? Daily? Hourly?</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>What SOPs Miss</h3>
+
+      <p>SOPs document the ideal process. Reality includes:</p>
+
+      <p>• 'I call Bob in accounting when this happens'</p>
+
+      <p>• 'We use a shared Excel sheet because the system doesn't talk to that one'</p>
+
+      <p>• 'If it's after 5pm, we just do it manually'</p>
+
+      <p>• 'This step used to be automated but the API broke'</p>
+
+      <br>
+
+      <p>These are your gold. They're where FDEs create value.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>From Observation to System</h3>
+
+      <pre>Observe → Document → Categorize → Design → Build → Test</pre>
+
+      <p>Exceptions fall into:</p>
+
+      <p>🔧 Fixable with a config change</p>
+
+      <p>🤖 Automatable with an agent</p>
+
+      <p>🧑 Needs a human (but agent can prep)</p>
+
+      <p>📋 Need a process change first</p>
+
+      <br>
+
+      <p>Not all exceptions need code. Some need a conversation.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record what you'd do to understand a client's exception patterns. Who would you talk to? What would you observe? How would you document the edge cases?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why do McKinsey consultants sit in mines?</div>
+
+          <div class="flashcard-back">1 hour of watching &gt; 10 hours of interviews</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 5 things during observation?</div>
+
+          <div class="flashcard-back">Shadow, ask &#39;show me&#39;, document, find pain, map exceptions</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What do SOPs miss?</div>
+
+          <div class="flashcard-back">Workarounds, manual patches, after-hours processes, broken automations</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are the 4 categories of exceptions?</div>
+
+          <div class="flashcard-back">Config fix, automatable, needs human, needs process change</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What to ask instead of &#39;What do you do?&#39;</div>
+
+          <div class="flashcard-back">Ask &#39;Can you show me?&#39;</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day13" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 13 of 30</div>
+
+    <h2>Failure Handling Architecture</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>System-Level Failures</h3>
+
+      <p>Individual exceptions are handled per-step. System-level failures affect the entire agent:</p>
+
+      <p>🔴 Downstream API is down</p>
+
+      <p>🔴 Rate limit hit across all clients</p>
+
+      <p>🔴 Model provider outage</p>
+
+      <p>🔴 Database connection lost</p>
+
+      <p>🔴 Memory leak / context overflow</p>
+
+      <br>
+
+      <p>These need architectural solutions, not per-step fixes.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Circuit Breaker Pattern</h3>
+
+      <pre>Normal → Detecting failures → Open circuit → Timeout → Half-open → Try → Normal
+                                                                    ↓ Fail
+                                                              Open circuit (again)</pre>
+
+      <p>After N consecutive failures, 'open' the circuit: stop calling, return fallback, alert.</p>
+
+      <p>After a timeout, try one request. If it succeeds, close the circuit. If it fails, stay open.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Backpressure & Queuing</h3>
+
+      <p>When the system can't keep up:</p>
+
+      <p>1. <b>Queue</b> — Put requests in a FIFO queue</p>
+
+      <p>2. <b>Backpressure</b> — Signal upstream to slow down</p>
+
+      <p>3. <b>Prioritize</b> — Critical requests first</p>
+
+      <p>4. <b>Drop</b> — Non-critical requests after queue full</p>
+
+      <br>
+
+      <p>Better to queue than crash.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Graceful Degradation</h3>
+
+      <p>When something fails, the system should degrade, not die:</p>
+
+      <p>• <b>Model down</b> → Switch to fallback model</p>
+
+      <p>• <b>Database down</b> → Use cached data</p>
+
+      <p>• <b>Tool down</b> → Skip that step, flag for later</p>
+
+      <p>• <b>Context full</b> → Summarize and continue</p>
+
+      <br>
+
+      <p>Degrade = still useful. Crash = useless.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate how your system handles: (1) API rate limit hit, (2) model returns garbage, (3) downstream system is down. Walk through the recovery flow.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the circuit breaker pattern?</div>
+
+          <div class="flashcard-back">After N failures, open circuit. After timeout, half-open, try again.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is backpressure?</div>
+
+          <div class="flashcard-back">Signaling upstream to slow down when system can&#39;t keep up</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is graceful degradation?</div>
+
+          <div class="flashcard-back">System stays useful instead of crashing when something fails</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 3 graceful degradation strategies</div>
+
+          <div class="flashcard-back">Fallback model, cached data, skip-and-flag</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What to do when system can&#39;t keep up?</div>
+
+          <div class="flashcard-back">Queue, backpressure, prioritize, drop (in order)</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day14" data-week="2">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 2 &middot; Day 14 of 30</div>
+
+    <h2>🎉 CHECKPOINT — Recoverable System</h2>
+
+    <div class="progress">Week 2: Make It Recoverable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Week 2 Checkpoint</h3>
+
+      <p>By Day 14, your agent should have:</p>
+
+      <p>✅ JSON schemas for all tool calls</p>
+
+      <p>✅ Schema validation with retry logic</p>
+
+      <p>✅ 10+ failure modes documented</p>
+
+      <p>✅ Exception handling for each mode</p>
+
+      <p>✅ Circuit breaker / graceful degradation</p>
+
+      <p>✅ Client context documentation</p>
+
+      <br>
+
+      <p>It's no longer a demo — it's a system.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Failure Demo</h3>
+
+      <p>A great failure demo shows:</p>
+
+      <p>1. <b>The happy path</b> — Works perfectly</p>
+
+      <p>2. <b>The failure</b> — Introduce a real failure (missing data, API down)</p>
+
+      <p>3. <b>The recovery</b> — Watch the agent handle it</p>
+
+      <p>4. <b>The audit trail</b> — Show the logs</p>
+
+      <p>5. <b>The fallback</b> — Show what the human sees</p>
+
+      <br>
+
+      <p>Clients trust systems that fail gracefully.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>What Success Looks Like</h3>
+
+      <p>Success at Day 14:</p>
+
+      <p>• You can sleep knowing your agent won't crash</p>
+
+      <p>• You've documented every exception you can think of</p>
+
+      <p>• You've tested each failure mode</p>
+
+      <p>• You understand the client's edge cases</p>
+
+      <p>• Your system degrades, not dies</p>
+
+      <br>
+
+      <p>Reliability is what separates pros from amateurs.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Week 3 Preview</h3>
+
+      <p>Next week, you'll make it measurable and economically viable:</p>
+
+      <p>• Retry logic with exponential backoff</p>
+
+      <p>• Golden dataset for evaluation</p>
+
+      <p>• Eval-driven improvement (70% → 95%)</p>
+
+      <p>• Model routing to minimize costs</p>
+
+      <p>• The three buckets: revenue, risk, cost</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 3-min walkthrough: show your schema validation, a failure scenario, and how the system recovers. What's the hardest failure mode you've solved?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 6 things should your agent have by Day 14?</div>
+
+          <div class="flashcard-back">Schemas, validation, failure modes, exception handling, circuit breaker, context</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should a failure demo show?</div>
+
+          <div class="flashcard-back">Happy path → failure → recovery → audit trail → fallback</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is success at Day 14?</div>
+
+          <div class="flashcard-back">Reliability — you can sleep knowing the agent won&#39;t crash</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the theme of Week 3?</div>
+
+          <div class="flashcard-back">Make it measurable and economically viable</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the #1 thing clients trust?</div>
+
+          <div class="flashcard-back">Systems that fail gracefully</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day15" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 15 of 30</div>
+
+    <h2>Retry Logic — Exponential Backoff & Fallback</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why Retry Logic?</h3>
+
+      <p>Failures are inevitable. Retry logic is how you handle them:</p>
+
+      <p>• <b>Transient failures</b> — Timeout, rate limit, network blip (retry)</p>
+
+      <p>• <b>Permanent failures</b> — Bad input, auth error (don't retry)</p>
+
+      <p>• <b>Degradation</b> — Model is slow, use a faster one (fallback)</p>
+
+      <br>
+
+      <p>Knowing the difference is critical.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Exponential Backoff</h3>
+
+      <pre>Attempt 1: Wait 1s
+Attempt 2: Wait 2s
+Attempt 3: Wait 4s
+Attempt 4: Wait 8s
+Attempt 5: Wait 16s → Max reached, escalate
+
+Formula: wait = base * (2 ^ attempt) + jitter</pre>
+
+      <p>Jitter adds randomness so all clients don't retry simultaneously.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Fallback Chain</h3>
+
+      <pre>Primary:    GPT-4o → Expensive, accurate
+Fallback 1: Claude Sonnet → Cheaper, still good
+Fallback 2: Gemini Flash → Fast, cheap
+Fallback 3: Rule-based → No model, just logic
+Fallback 4: Human → Escalate</pre>
+
+      <p>Each fallback is cheaper and less capable, but better than failing.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Retry Budget</h3>
+
+      <p>Define limits before they hit your wallet:</p>
+
+      <p>• Max retries per step: 3</p>
+
+      <p>• Max total retries per run: 10</p>
+
+      <p>• Max time per run: 5 minutes</p>
+
+      <p>• Max cost per run: $0.50</p>
+
+      <p>• Fallback after: 3rd retry failure</p>
+
+      <br>
+
+      <p>When budget is exceeded → halt, log, alert.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record your retry strategy. How many retries? What backoff? When do you switch to a fallback model? When do you escalate to a human?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the difference between transient and permanent failures?</div>
+
+          <div class="flashcard-back">Transient = retry. Permanent = don&#39;t retry.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is exponential backoff?</div>
+
+          <div class="flashcard-back">Wait time doubles each attempt: 1s, 2s, 4s, 8s, 16s</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is jitter?</div>
+
+          <div class="flashcard-back">Randomness added to backoff so clients don&#39;t retry simultaneously</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name the fallback chain order</div>
+
+          <div class="flashcard-back">Primary → Fallback 1 → Fallback 2 → Rule-based → Human</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What goes in a retry budget?</div>
+
+          <div class="flashcard-back">Max retries per step, per run, max time, max cost</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day16" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 16 of 30</div>
+
+    <h2>Golden Data Set — The Foundation of Eval</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>What is a Golden Dataset?</h3>
+
+      <p>A curated, hand-verified set of test cases:</p>
+
+      <pre>{
+  "input": "Invoice INV-442 from Acme Corp for $15,000",
+  "expected": {
+    "vendor": "Acme Corp",
+    "invoice_id": "INV-442",
+    "amount": 15000,
+    "po_match": true
+  }
+}</pre>
+
+      <p>Each case has: input, expected output, and edge case tags.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Building Your Dataset</h3>
+
+      <p>1. <b>Collect 20 real examples</b> — From your workflow mapping</p>
+
+      <p>2. <b>Hand-verify each</b> — A human checks the expected output</p>
+
+      <p>3. <b>Cover the edges</b> — 10 happy path, 10 exceptions</p>
+
+      <p>4. <b>Tag each case</b> — 'missing_po', 'duplicate', 'over_threshold'</p>
+
+      <p>5. <b>Version control it</b> — Track changes over time</p>
+
+      <br>
+
+      <p>20 good cases beat 200 sloppy ones.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>What Makes a Good Test Case?</h3>
+
+      <p>• <b>Realistic</b> — Based on actual data, not invented</p>
+
+      <p>• <b>Specific</b> — Clear input, unambiguous expected output</p>
+
+      <p>• <b>Edge-conscious</b> — Tests both success and failure modes</p>
+
+      <p>• <b>Independent</b> — Each case stands alone</p>
+
+      <p>• <b>Measurable</b> — Pass/fail is unambiguous</p>
+
+      <br>
+
+      <p>If two people disagree on the answer, it's not a good test case.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Using Your Dataset</h3>
+
+      <p>The golden dataset drives everything:</p>
+
+      <p>1. <b>Baseline</b> — Run your agent, get a score</p>
+
+      <p>2. <b>Improve</b> — Fix the biggest failure patterns</p>
+
+      <p>3. <b>Re-run</b> — Score should go up</p>
+
+      <p>4. <b>Regression</b> — New version shouldn't break old cases</p>
+
+      <p>5. <b>Report</b> — 'Week 3: 85% accuracy, up from 72%'</p>
+
+      <br>
+
+      <p>Without a dataset, you're guessing.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate how you'd build a golden dataset for your workflow. How many examples? Who creates them? What makes a good test case vs a bad one?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is a golden dataset?</div>
+
+          <div class="flashcard-back">Curated, hand-verified set of input-output pairs for evaluation</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How many test cases to start?</div>
+
+          <div class="flashcard-back">20 — 10 happy path, 10 exceptions</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What makes a good test case?</div>
+
+          <div class="flashcard-back">Realistic, specific, edge-conscious, independent, measurable</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does the golden dataset drive?</div>
+
+          <div class="flashcard-back">Baseline, improvement, regression testing, reporting</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why is 20 good &gt; 200 sloppy?</div>
+
+          <div class="flashcard-back">Quality over quantity — bad data gives false confidence</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day17" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 17 of 30</div>
+
+    <h2>Improving Over Time — Eval-Driven Development</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Eval Loop</h3>
+
+      <pre>Run Agent → Measure Accuracy → Analyze Failures → Fix → Re-run
+   ↑                                                |
+   └────────────────────────────────────────────────┘</pre>
+
+      <p>Each cycle should improve accuracy. Target: 70% → 80% → 90% → 95%</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Measuring Accuracy</h3>
+
+      <p>For each test case:</p>
+
+      <p>• <b>Exact match</b> — Output matches expected exactly</p>
+
+      <p>• <b>Partial match</b> — Key fields correct, some wrong</p>
+
+      <p>• <b>Hallucination</b> — Agent invented data</p>
+
+      <p>• <b>Missing</b> — Agent didn't complete the task</p>
+
+      <p>• <b>Error</b> — Agent crashed or threw exception</p>
+
+      <br>
+
+      <p>Score = (exact + partial) / total cases x 100</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Error Analysis</h3>
+
+      <p>When accuracy is below target, categorize failures:</p>
+
+      <table><tr><th>Category</th><th>Count</th><th>%</th><th>Root Cause</th></tr>
+
+      <tr><td>Missing data</td><td>7</td><td>35%</td><td>Poor extraction prompt</td></tr>
+
+      <tr><td>Wrong vendor</td><td>4</td><td>20%</td><td>Fuzzy matching threshold</td></tr>
+
+      <tr><td>Amount off</td><td>3</td><td>15%</td><td>Currency format mismatch</td></tr>
+
+      <tr><td>Hallucination</td><td>2</td><td>10%</td><td>Missing guardrail</td></tr></table>
+
+      <p>Fix the biggest category first.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Iteration Tracking</h3>
+
+      <p>Keep a running log:</p>
+
+      <pre>V1: 72% — Baseline
+V2: 78% — Fixed missing data prompt (+6%)
+V3: 84% — Added fuzzy vendor matching (+6%)
+V4: 88% — Currency format handling (+4%)
+V5: 91% — Added hallucination guardrail (+3%)</pre>
+
+      <p>Show this to clients. It proves you improve.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record your eval process. Run your agent against 5 test cases. Dictate the results. What failed? Why? What's your fix?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the eval loop?</div>
+
+          <div class="flashcard-back">Run → Measure → Analyze → Fix → Re-run (repeat)</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are the 5 output categories?</div>
+
+          <div class="flashcard-back">Exact match, partial match, hallucination, missing, error</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you fix first?</div>
+
+          <div class="flashcard-back">The biggest failure category (Pareto principle)</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the target accuracy range?</div>
+
+          <div class="flashcard-back">Start at 70%, iterate to 95%+</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does an iteration log prove?</div>
+
+          <div class="flashcard-back">That you systematically improve over time</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day18" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 18 of 30</div>
+
+    <h2>Cheaper Models for Subtasks — Route Intelligently</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Cost Gap</h3>
+
+      <table><tr><th>Model</th><th>Cost/1M tokens</th><th>Use Case</th></tr>
+
+      <tr><td>GPT-4o</td><td>$15</td><td>Complex reasoning</td></tr>
+
+      <tr><td>Claude Sonnet</td><td>$3</td><td>Balanced tasks</td></tr>
+
+      <tr><td>Gemini Flash</td><td>$0.15</td><td>Simple extraction</td></tr>
+
+      <tr><td>Haiku</td><td>$0.25</td><td>Classification</td></tr>
+
+      <tr><td>Llama 4</td><td>Free</td><td>High-volume, private</td></tr></table>
+
+      <p>Frontier models cost 100x more than cheap ones.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Model Routing Strategy</h3>
+
+      <pre>Workflow Step → Is this high-judgment? → Yes → Frontier Model
+                                    ↓ No
+                  Is this pattern-matching? → Yes → Cheap Model
+                                         ↓ No
+                       Is this deterministic? → Yes → Rule-based (no LLM needed)</pre>
+
+      <p>Route each step to the cheapest model that can do the job.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Invoice Agent Routing Example</h3>
+
+      <table><tr><th>Step</th><th>Model</th><th>Why</th></tr>
+
+      <tr><td>Extract PDF text</td><td>Gemini Flash</td><td>Low complexity</td></tr>
+
+      <tr><td>Classify invoice type</td><td>Haiku</td><td>Simple classification</td></tr>
+
+      <tr><td>Match line items</td><td>Claude Sonnet</td><td>Needs judgment</td></tr>
+
+      <tr><td>Flag discrepancies</td><td>GPT-4o</td><td>High-stakes decision</td></tr>
+
+      <tr><td>Send email</td><td>Rule-based</td><td>No LLM needed</td></tr></table>
+
+      <p>Cost savings: ~80% vs using GPT-4o for everything.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>The Economics</h3>
+
+      <pre>All GPT-4o:      $0.15 per run
+Optimized route:  $0.03 per run
+Savings:          80%
+
+At 1,000 runs/month:
+All GPT-4o:      $150/month
+Optimized route:  $30/month
+Savings:          $120/month per client</pre>
+
+      <p>Routing is how you make the economics work for SMBs.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Open your workflow from Day 6. Dictate which steps need a frontier model and which can use a cheap model. Calculate the cost difference per 100 runs.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How much can Gemini Flash cost vs GPT-4o?</div>
+
+          <div class="flashcard-back">100x difference — $0.15/M vs $15/M</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the routing question for each step?</div>
+
+          <div class="flashcard-back">High-judgment? Frontier. Pattern-matching? Cheap. Deterministic? Rules.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What model for PDF extraction?</div>
+
+          <div class="flashcard-back">Gemini Flash — low complexity, high volume</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What model for high-stakes decisions?</div>
+
+          <div class="flashcard-back">GPT-4o or Claude Sonnet — needs strong judgment</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s typical cost savings from routing?</div>
+
+          <div class="flashcard-back">~80% vs using frontier models for everything</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day19" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 19 of 30</div>
+
+    <h2>Less Frontier — Find the Right Model for the Job</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Benchmarking Process</h3>
+
+      <p>1. Pick ONE task from your workflow</p>
+
+      <p>2. Define the success criteria (exact match? partial?)</p>
+
+      <p>3. Run it on 3 models: cheap, mid, frontier</p>
+
+      <p>4. Compare: accuracy, speed, cost</p>
+
+      <p>5. Pick the best value, not the best accuracy</p>
+
+      <br>
+
+      <p>If a $0.15 model gets 90% and a $15 model gets 95%, the $0.15 model wins.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Benchmark Results Example</h3>
+
+      <table><tr><th>Model</th><th>Accuracy</th><th>Latency</th><th>Cost/1K</th><th>Verdict</th></tr>
+
+      <tr><td>GPT-4o</td><td>97%</td><td>2.1s</td><td>$150</td><td>Best accuracy</td></tr>
+
+      <tr><td>Claude Sonnet</td><td>94%</td><td>1.8s</td><td>$30</td><td>Best value</td></tr>
+
+      <tr><td>Gemini Flash</td><td>88%</td><td>0.9s</td><td>$1.50</td><td>Good enough</td></tr>
+
+      <tr><td>Haiku</td><td>85%</td><td>1.2s</td><td>$2.50</td><td>Good enough</td></tr></table>
+
+      <p>Winner: Claude Sonnet — 94% accuracy at 1/5 the cost.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>When to Use Frontier</h3>
+
+      <p>Use frontier models ONLY when:</p>
+
+      <p>1. <b>Accuracy is critical</b> — Medical, legal, financial decisions</p>
+
+      <p>2. <b>The cost of error is high</b> — Wrong payment, compliance violation</p>
+
+      <p>3. <b>The task is genuinely novel</b> — Not a pattern you've seen before</p>
+
+      <p>4. <b>You need the full context window</b> — 200K tokens</p>
+
+      <br>
+
+      <p>Everything else → cheap model + good prompting.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>The 80/20 Rule</h3>
+
+      <p>80% of tasks can be handled by cheap models.</p>
+
+      <p>20% of tasks need frontier models.</p>
+
+      <br>
+
+      <p>But most teams spend 100% of their budget on frontier models.</p>
+
+      <br>
+
+      <p>Your edge as an FDE: knowing which is which and routing accordingly.</p>
+
+      <p>The client doesn't care which model you use. They care about the price.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Run the same task on 2 different models (one cheap, one frontier). Dictate the comparison: accuracy, speed, cost. Which would you use in production?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the benchmark process?</div>
+
+          <div class="flashcard-back">Pick task, define success, run on 3 models, compare</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Which model wins if cheap gets 90% and frontier gets 95%?</div>
+
+          <div class="flashcard-back">Cheap — 90% is good enough at 1/100th the cost</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">When should you use frontier models?</div>
+
+          <div class="flashcard-back">Critical accuracy, high error cost, novel tasks, long context</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the 80/20 rule for models?</div>
+
+          <div class="flashcard-back">80% of tasks use cheap models, 20% need frontier</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does the client care about?</div>
+
+          <div class="flashcard-back">The price, not which model you use</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day20" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 20 of 30</div>
+
+    <h2>Measurement — The Three Buckets</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Three Buckets</h3>
+
+      <p>There are only 3 ways an agent creates business value:</p>
+
+      <br>
+
+      <p>💰 <b>Revenue Uplift</b> — More deals, faster closes, higher lifetime value</p>
+
+      <p>🛡️ <b>Risk Mitigation</b> — Fewer errors, compliance, audit trails</p>
+
+      <p>📉 <b>Cost Savings</b> — Less time, fewer people, lower overhead</p>
+
+      <br>
+
+      <p>Every agent must be measured against all three.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Revenue Uplift Example</h3>
+
+      <p>Lead routing agent:</p>
+
+      <p>• Before: 2-hour response time → 20% conversion</p>
+
+      <p>• After: 30-second response time → 35% conversion</p>
+
+      <p>• Uplift: 15% more deals closed</p>
+
+      <p>• Value: 15% × $500K pipeline = $75K/year</p>
+
+      <br>
+
+      <p>Speak the client's language: revenue.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Risk Mitigation Example</h3>
+
+      <p>Invoice processing agent:</p>
+
+      <p>• Before: 3% error rate, manual audits, 1 fraud incident/year</p>
+
+      <p>• After: 0.1% error rate, automated audit trail, real-time flagging</p>
+
+      <p>• Risk reduction: $50K in fraud prevention + compliance coverage</p>
+
+      <br>
+
+      <p>Most clients don't measure risk. You quantify it for them.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Cost Savings Example</h3>
+
+      <p>Customer support agent:</p>
+
+      <p>• Before: 5 agents, 1,000 tickets/week, $25/ticket</p>
+
+      <p>• After: 2 agents + agent handles 60% of tickets</p>
+
+      <p>• Savings: 3 FTE × $50K = $150K/year</p>
+
+      <br>
+
+      <p>Don't sell 'cost savings' alone. Sell revenue + risk + cost together.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>For your agent, dictate the numbers for each bucket: How much time saved? How much risk reduced? How much revenue could it unlock? Record your estimates.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are the three buckets?</div>
+
+          <div class="flashcard-back">Revenue uplift, risk mitigation, cost savings</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does revenue uplift measure?</div>
+
+          <div class="flashcard-back">More deals, faster closes, higher lifetime value</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does risk mitigation measure?</div>
+
+          <div class="flashcard-back">Fewer errors, compliance, fraud prevention, audit trails</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does cost savings measure?</div>
+
+          <div class="flashcard-back">Less time, fewer people, lower overhead</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why measure all three buckets?</div>
+
+          <div class="flashcard-back">A single bucket is weak. All three together is compelling.</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day21" data-week="3">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 3 &middot; Day 21 of 30</div>
+
+    <h2>🎉 CHECKPOINT — Measurable, Economically Viable Agent</h2>
+
+    <div class="progress">Week 3: Make It Measurable</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Week 3 Checkpoint</h3>
+
+      <p>By Day 21, your agent should have:</p>
+
+      <p>✅ Retry logic with exponential backoff</p>
+
+      <p>✅ Golden dataset (20+ test cases)</p>
+
+      <p>✅ Eval results (accuracy score)</p>
+
+      <p>✅ Model routing strategy</p>
+
+      <p>✅ Cost per run calculated</p>
+
+      <p>✅ All three buckets measured</p>
+
+      <br>
+
+      <p>You know what it costs, what it achieves, and what it's worth.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Agent Scorecard</h3>
+
+      <pre>ACCURACY:     88% (up from 72% V1)
+COST PER RUN: $0.03
+MONTHLY COST:  $30 (at 1,000 runs)
+
+REVENUE:      $75K/year uplift
+RISK:         $50K/year fraud prevention
+COST SAVINGS: $150K/year headcount
+
+ROI:          9,000% ($275K / $30 * 12)</pre>
+
+      <p>This is the slide that closes deals.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>What Success Looks Like</h3>
+
+      <p>Success at Day 21:</p>
+
+      <p>• You can prove your agent works with data</p>
+
+      <p>• You know the exact cost to run it</p>
+
+      <p>• You can articulate the business value in money</p>
+
+      <p>• You have a roadmap for improvement (95% target)</p>
+
+      <p>• You can answer: 'Is this worth deploying?'</p>
+
+      <br>
+
+      <p>If the answer is yes, you're ready to sell.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Week 4 Preview</h3>
+
+      <p>Next week, you'll defend the system like an FDE:</p>
+
+      <p>• The pain points — why AI belongs here</p>
+
+      <p>• The architecture — explain it to anyone</p>
+
+      <p>• Iterations — show the journey</p>
+
+      <p>• The economics — pricing and ROI</p>
+
+      <p>• Rehearse as engineer AND as VP</p>
+
+      <p>• Pitch to real businesses</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 3-min summary: accuracy, cost per run, failure modes, business value. Is this agent worth deploying? What's the ROI story?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 6 things should your agent have by Day 21?</div>
+
+          <div class="flashcard-back">Retry logic, golden dataset, eval results, routing, cost, three buckets</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What goes on the agent scorecard?</div>
+
+          <div class="flashcard-back">Accuracy, cost per run, monthly cost, revenue, risk, savings, ROI</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is success at Day 21?</div>
+
+          <div class="flashcard-back">Prove the agent works, know its cost, articulate its value in money</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the theme of Week 4?</div>
+
+          <div class="flashcard-back">Defend the system like an FDE</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What question should you answer by Day 21?</div>
+
+          <div class="flashcard-back">&#39;Is this worth deploying?&#39;</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day22" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 22 of 30</div>
+
+    <h2>The Pain Points — Why AI Belongs Here</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Pain Before Solution</h3>
+
+      <p>Never start with the solution. Start with the pain:</p>
+
+      <p>❌ 'We built an AI agent that processes invoices!'</p>
+
+      <p>✅ 'Your AP team is drowning in 500 invoices/week. Errors cost you $50K/year. Here's how we fix it.'</p>
+
+      <br>
+
+      <p>Pain first → solution second. Always.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Pain Framework</h3>
+
+      <pre>1. Who is suffering?  → AP team, 3 people
+2. How bad is it?    → 500 invoices/week, 3% error rate
+3. What's it costing? → $50K in errors, $150K in labor
+4. Why now?          → AI is finally reliable enough
+5. What if we don't?  → Competitors will automate first</pre>
+
+      <p>Answer these 5 questions and you have your narrative.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>The Cost of Inaction</h3>
+
+      <p>Clients need to feel the pain of NOT doing it:</p>
+
+      <p>• 'Your competitors are already automating this'</p>
+
+      <p>• 'Every month you wait is another $4K in errors'</p>
+
+      <p>• 'Your best people are doing data entry instead of strategy'</p>
+
+      <p>• 'Manual processes don't scale — you'll need to hire 3 more people next year'</p>
+
+      <br>
+
+      <p>The status quo has a cost. Make it visible.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Pain Pitch</h3>
+
+      <p>For your agent, dictate:</p>
+
+      <p>1. Who is suffering?</p>
+
+      <p>2. How bad is it? (quantify)</p>
+
+      <p>3. What's it costing? (dollars)</p>
+
+      <p>4. Why now?</p>
+
+      <p>5. What if we don't?</p>
+
+      <br>
+
+      <p>Record a 90-second version. Then 30-second. Then 15-second.</p>
+
+      <p>You need all three lengths for different audiences.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 90-sec pitch: what pain does your agent solve? Why does AI belong in this workflow specifically? What's the cost of NOT doing it?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you start with — pain or solution?</div>
+
+          <div class="flashcard-back">Pain first, solution second. Always.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What are the 5 pain framework questions?</div>
+
+          <div class="flashcard-back">Who suffers? How bad? Cost? Why now? What if we don&#39;t?</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the cost of inaction?</div>
+
+          <div class="flashcard-back">Price of doing nothing — competitors, errors, scaling problems</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 3 pitch lengths do you need?</div>
+
+          <div class="flashcard-back">90-sec (deep), 30-sec (elevator), 15-sec (headline)</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why lead with pain?</div>
+
+          <div class="flashcard-back">People buy solutions to problems, not technology</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day23" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 23 of 30</div>
+
+    <h2>The Architecture — How It Works</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Two Audiences, Two Stories</h3>
+
+      <table><tr><th>VP Level</th><th>Engineer Level</th></tr>
+
+      <tr><td>What it does</td><td>How it works</td></tr>
+
+      <tr><td>Business outcome</td><td>Technical decisions</td></tr>
+
+      <tr><td>Risk & timeline</td><td>Architecture & trade-offs</td></tr>
+
+      <tr><td>Cost & ROI</td><td>Stack & dependencies</td></tr>
+
+      <tr><td>3 min</td><td>10 min</td></tr></table>
+
+      <p>You need both. Switch between them seamlessly.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>VP-Level Architecture</h3>
+
+      <p>Keep it to 3 slides:</p>
+
+      <p>1. <b>Input</b> — Invoice comes in (email, upload, scan)</p>
+
+      <p>2. <b>Process</b> — Our AI extracts, matches, and validates</p>
+
+      <p>3. <b>Output</b> — Approved invoice, audit trail, exception report</p>
+
+      <br>
+
+      <p>No mention of models, tokens, schemas, or vector DBs.</p>
+
+      <p>Just: data in → intelligent processing → value out.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Engineer-Level Architecture</h3>
+
+      <pre>┌─────────────┐    ┌──────────┐    ┌──────────┐
+│  Email API  │───→│  Agent   │───→│  Tool    │
+│  (trigger)  │    │  Loop    │    │  Registry│
+└─────────────┘    └────┬─────┘    └────┬─────┘
+                        │              │
+                   ┌────▼─────┐   ┌────▼─────┐
+                   │  Memory  │   │  Schema  │
+                   │  (RAG)   │   │  Valid.  │
+                   └──────────┘   └──────────┘</pre>
+
+      <p>Include: models used, fallback chain, guardrails, eval pipeline.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Architecture Narrative</h3>
+
+      <p>Record both versions:</p>
+
+      <br>
+
+      <b>VP version (2 min):</b>
+
+      <p>'Invoices come in, the system extracts and processes them, you get approved invoices with full audit trails.'</p>
+
+      <br>
+
+      <b>Engineer version (5 min):</b>
+
+      <p>'We use GPT-4o for matching, Gemini Flash for extraction, with a circuit breaker for API failures and a golden dataset for eval.'</p>
+
+      <br>
+
+      <p>Practice switching between them.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a walkthrough of your agent architecture. Speak it as if to a VP (high level) first, then as if to an engineer (technical).</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does a VP care about?</div>
+
+          <div class="flashcard-back">What it does, business outcome, risk, cost, timeline</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does an engineer care about?</div>
+
+          <div class="flashcard-back">How it works, technical decisions, architecture, trade-offs</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How long should a VP-level explanation be?</div>
+
+          <div class="flashcard-back">~3 minutes, 3 slides max</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you NEVER mention in a VP pitch?</div>
+
+          <div class="flashcard-back">Technical jargon — models, tokens, schemas, vector DBs</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Why do you need both versions?</div>
+
+          <div class="flashcard-back">Different stakeholders need different information to say yes</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day24" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 24 of 30</div>
+
+    <h2>Iterations — From 70% to 95%</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Iteration Story</h3>
+
+      <p>Clients don't expect perfection. They expect improvement:</p>
+
+      <p>V1: 72% — 'We built the first version. It worked but had issues.'</p>
+
+      <p>V2: 78% — 'Fixed the extraction prompt.'</p>
+
+      <p>V3: 84% — 'Added fuzzy vendor matching.'</p>
+
+      <p>V4: 88% — 'Handled currency formats.'</p>
+
+      <p>V5: 91% — 'Added hallucination guardrail.'</p>
+
+      <br>
+
+      <p>Story: 'We started rough, learned fast, and kept improving.'</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>What Each Iteration Teaches</h3>
+
+      <table><tr><th>Iteration</th><th>What You Learn</th></tr>
+
+      <tr><td>V1</td><td>Baseline — how bad is it really?</td></tr>
+
+      <tr><td>V2</td><td>The biggest failure pattern</td></tr>
+
+      <tr><td>V3</td><td>Edge cases you missed</td></tr>
+
+      <tr><td>V4</td><td>Real-world data complexity</td></tr>
+
+      <tr><td>V5</td><td>Diminishing returns — where to stop</td></tr></table>
+
+      <p>Each iteration teaches you something about the problem.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>The Improvement Curve</h3>
+
+      <p>The curve flattens. Know when to stop:</p>
+
+      <p>• 95%+ is production-ready</p>
+
+      <p>• 98%+ is enterprise-grade</p>
+
+      <p>• 100% is impossible (and unnecessary)</p>
+
+      <br>
+
+      <p>The iteration story proves you're a learner, not a builder.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Iteration Story</h3>
+
+      <p>Dictate your iteration history:</p>
+
+      <p>1. V1 accuracy and top failure</p>
+
+      <p>2. What you changed</p>
+
+      <p>3. V2 accuracy and what you learned</p>
+
+      <p>4. Continue through your latest version</p>
+
+      <p>5. Your target for next iteration</p>
+
+      <br>
+
+      <p>This story proves you can iterate.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Dictate the iteration history of your agent. Version 1 got what wrong? What did you change? What's the accuracy now? What's your next improvement target?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does each iteration teach you?</div>
+
+          <div class="flashcard-back">V1: baseline, V2: biggest failure, V3: edge cases, V4: complexity, V5: diminishing returns</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the shape of the improvement curve?</div>
+
+          <div class="flashcard-back">Steep at first, flattens as you approach 95%+</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">When is an agent production-ready?</div>
+
+          <div class="flashcard-back">95%+ accuracy</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is enterprise-grade?</div>
+
+          <div class="flashcard-back">98%+ accuracy</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What does the iteration story prove?</div>
+
+          <div class="flashcard-back">You&#39;re a learner, not just a builder</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day25" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 25 of 30</div>
+
+    <h2>The Economics — Cost, Value, Pricing</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Pricing Equation</h3>
+
+      <pre>Client Value - Agent Cost = Your Margin
+
+Value: $275K/year (revenue + risk + savings)
+Cost:  $360/year ($30/month × 12)
+Your Price: $24,000/year ($2,000/month)
+
+Client ROI: 11x ($275K / $24K)
+Your Margin: 98% ($24K - $360) / $24K</pre>
+
+      <p>Win-win: client gets 11x return, you get 98% margin.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Pricing Models</h3>
+
+      <table><tr><th>Model</th><th>When to Use</th><th>Example</th></tr>
+
+      <tr><td>Hourly</td><td>Discovery, audits</td><td>$200/hr</td></tr>
+
+      <tr><td>Project</td><td>Fixed scope</td><td>$15K for first agent</td></tr>
+
+      <tr><td>Monthly retainer</td><td>Ongoing ops</td><td>$2K/month</td></tr>
+
+      <tr><td>Value-based</td><td>Clear ROI</td><td>10% of savings</td></tr>
+
+      <tr><td>Outcome-based</td><td>High trust</td><td>$1K per deal closed</td></tr></table>
+
+      <p>Start with project + retainer for stability.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Building the Pricing Page</h3>
+
+      <pre>AI Workflow Audit:      $2,500 (one-time)
+Agent Build & Deploy:   $15,000 (one-time)
+Monthly Ops & Support:  $2,000/month
+
+Or get started with:
+Discovery Sprint:       $500 (includes audit report)</pre>
+
+      <p>Always offer a low-friction entry point.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Pricing Model</h3>
+
+      <p>Dictate your pricing:</p>
+
+      <p>1. What's your audit/discovery price?</p>
+
+      <p>2. What's your build price?</p>
+
+      <p>3. What's your monthly retainer?</p>
+
+      <p>4. What's the client ROI at each tier?</p>
+
+      <p>5. What's your margin?</p>
+
+      <br>
+
+      <p>If you can't explain the economics simply, you can't sell it.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record your pricing model. Cost to run per month → value delivered per month → your price. What's the ROI for the client? What's your margin?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the only equation that matters?</div>
+
+          <div class="flashcard-back">Client Value &gt; Client Price, and Your Margin &gt; 80%</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 3 pricing models</div>
+
+          <div class="flashcard-back">Hourly, project, monthly retainer, value-based, outcome-based</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s a good low-friction entry point?</div>
+
+          <div class="flashcard-back">Discovery Sprint for $500 — includes audit report</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you always offer?</div>
+
+          <div class="flashcard-back">A low-friction entry point</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the win-win formula?</div>
+
+          <div class="flashcard-back">Client gets &gt;5x ROI, you get &gt;80% margin</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day26" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 26 of 30</div>
+
+    <h2>Rehearse as Engineer — Technical Depth</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Engineer Interview</h3>
+
+      <p>You will be grilled by CTOs, technical founders, and lead engineers. Be ready for:</p>
+
+      <p>• 'Why did you choose GPT-4o over Claude?'</p>
+
+      <p>• 'What happens when the API is down?'</p>
+
+      <p>• 'How do you handle hallucinations?'</p>
+
+      <p>• 'What's the latency budget?'</p>
+
+      <p>• 'How do you prevent prompt injection?'</p>
+
+      <br>
+
+      <p>Every answer should show trade-off awareness.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Answering Technical Questions</h3>
+
+      <p>Bad answer: 'GPT-4o is the best model.'</p>
+
+      <p>Good answer: 'We tested 3 models. GPT-4o was most accurate for the matching step, but we use Gemini Flash for extraction and Claude for fallback. We optimized for cost + accuracy.'</p>
+
+      <br>
+
+      <p>Show you evaluated alternatives.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Common Technical Questions</h3>
+
+      <p>1. <b>Security</b> — 'How do you prevent prompt injection?'</p>
+
+      <p>2. <b>Reliability</b> — 'What happens when it fails?'</p>
+
+      <p>3. <b>Scalability</b> — 'Can it handle 10x volume?'</p>
+
+      <p>4. <b>Cost</b> — 'How much does this really cost?'</p>
+
+      <p>5. <b>Accuracy</b> — 'How do you know it's working?'</p>
+
+      <br>
+
+      <p>Prepare answers for all five.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Engineering Defense</h3>
+
+      <p>Record yourself answering:</p>
+
+      <p>1. Why this architecture?</p>
+
+      <p>2. What were the alternatives?</p>
+
+      <p>3. What trade-offs did you make?</p>
+
+      <p>4. What's the biggest risk?</p>
+
+      <p>5. How do you know it works?</p>
+
+      <br>
+
+      <p>Listen back. Are you convincing? Do you sound like you know your stuff?</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record yourself answering: What was the architecture? What decisions did you make? What alternatives did you consider? What trade-offs are you living with?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Who will grill you on technical decisions?</div>
+
+          <div class="flashcard-back">CTOs, technical founders, and lead engineers</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should every answer show?</div>
+
+          <div class="flashcard-back">Trade-off awareness — you evaluated alternatives</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Name 5 common technical questions</div>
+
+          <div class="flashcard-back">Security, reliability, scalability, cost, accuracy</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s a bad answer to &#39;Why model X?&#39;</div>
+
+          <div class="flashcard-back">&#39;Because it&#39;s the best&#39; — shows no evaluation</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s a good answer?</div>
+
+          <div class="flashcard-back">Shows testing, comparison, and trade-off reasoning</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day27" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 27 of 30</div>
+
+    <h2>Rehearse as VP — Business Narrative</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The VP Story Arc</h3>
+
+      <p>VPs don't care about tech. They care about:</p>
+
+      <p>1. <b>Problem</b> — 'Your AP team is drowning'</p>
+
+      <p>2. <b>Outcome</b> — 'Cut processing time by 80%, errors by 90%'</p>
+
+      <p>3. <b>Evidence</b> — 'We've run 1,000 invoices at 95% accuracy'</p>
+
+      <p>4. <b>Risk</b> — 'Low risk: phased rollout, full audit trail, human oversight'</p>
+
+      <p>5. <b>Next</b> — 'Let's start with a 2-week pilot'</p>
+
+      <br>
+
+      <p>That's it. 5 minutes. No tech jargon.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The VP Language</h3>
+
+      <p>❌ 'We use a multi-agent architecture with RAG and structured output schemas'</p>
+
+      <p>✅ 'The system handles the entire workflow automatically, flagging anything unusual for your team'</p>
+
+      <br>
+
+      <p>❌ 'Our model routing optimizes cost-performance trade-offs'</p>
+
+      <p>✅ 'We make sure you're only paying for what you need'</p>
+
+      <br>
+
+      <p>Translate tech into business outcomes.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Speak to Their Incentives</h3>
+
+      <p>Every VP wants to hear:</p>
+
+      <p>• 'This will make your department look good'</p>
+
+      <p>• 'Your team will be more productive'</p>
+
+      <p>• 'You'll have data to show your boss'</p>
+
+      <p>• 'Your competitors are already doing this'</p>
+
+      <p>• 'This is low-risk and high-reward'</p>
+
+      <br>
+
+      <p>Frame your pitch around their success, not your technology.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your VP Narrative</h3>
+
+      <p>Record yourself delivering:</p>
+
+      <p>1. Problem (30s)</p>
+
+      <p>2. Outcome (30s)</p>
+
+      <p>3. Evidence (30s)</p>
+
+      <p>4. Risk & Mitigation (30s)</p>
+
+      <p>5. Next Step (30s)</p>
+
+      <br>
+
+      <p>Total: 2:30. No jargon. Just business.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record the same pitch as a VP conversation: problem → outcome → evidence → risk → next steps. No technical jargon. Just business outcomes.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the VP story arc?</div>
+
+          <div class="flashcard-back">Problem → Outcome → Evidence → Risk → Next Step</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you NEVER say to a VP?</div>
+
+          <div class="flashcard-back">Technical jargon — models, architecture, schemas, RAG</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What do VPs care about?</div>
+
+          <div class="flashcard-back">How it makes them and their department look good</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How long should a VP pitch be?</div>
+
+          <div class="flashcard-back">2:30 — 5 sections of 30 seconds each</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you frame your pitch around?</div>
+
+          <div class="flashcard-back">Their success, not your technology</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day28" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 28 of 30</div>
+
+    <h2>Full Pitch Practice — Engineer + VP Mode</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>The Full Pitch Structure</h3>
+
+      <pre>0:00-1:30  VP Mode: Problem → Outcome → Evidence
+1:30-3:00  Engineer Mode: Architecture → Trade-offs → Eval
+3:00-4:00  VP Mode: Economics → Risk → Next Steps
+4:00-5:00  Q&A / Close</pre>
+
+      <p>Seamless transitions between modes show mastery.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The Pivot Phrases</h3>
+
+      <p>Moving from VP → Engineer:</p>
+
+      <p>'Let me quickly show you how that works under the hood...'</p>
+
+      <br>
+
+      <p>Moving from Engineer → VP:</p>
+
+      <p>'So what does that mean for your business? It means...'</p>
+
+      <br>
+
+      <p>These pivots let you switch languages without losing the room.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Handling the Room</h3>
+
+      <p>In a real meeting, you'll have mixed audience:</p>
+
+      <p>• <b>CEO</b> — Cares about revenue, competitive advantage</p>
+
+      <p>• <b>CTO</b> — Cares about architecture, security, reliability</p>
+
+      <p>• <b>VP Ops</b> — Cares about workflow, team impact, timeline</p>
+
+      <p>• <b>CFO</b> — Cares about cost, ROI, contract terms</p>
+
+      <br>
+
+      <p>Address each implicitly. The CEO hears revenue. The CTO hears architecture. Same words, different ears.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>Your Full Pitch</h3>
+
+      <p>Record a 5-min pitch:</p>
+
+      <p>1. Open VP: Problem + Outcome (90s)</p>
+
+      <p>2. Engineer: Architecture + Eval (90s)</p>
+
+      <p>3. Return VP: Economics + Next Steps (60s)</p>
+
+      <p>4. Close: The ask (30s)</p>
+
+      <br>
+
+      <p>Listen back. What would you change? Re-record. Repeat until tight.</p>
+
+      <p>This is your Day 30 deliverable.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 5-min full pitch: problem → architecture → evidence → economics → ask. Listen back. What would you change? Re-record until it's tight.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the full pitch structure?</div>
+
+          <div class="flashcard-back">VP mode → Engineer mode → VP mode → Close</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s a good pivot from VP to engineer?</div>
+
+          <div class="flashcard-back">&#39;Let me show you how that works under the hood&#39;</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s a good pivot from engineer to VP?</div>
+
+          <div class="flashcard-back">&#39;So what does that mean for your business?&#39;</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Who is in the room?</div>
+
+          <div class="flashcard-back">CEO, CTO, VP Ops, CFO — address each implicitly</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is your Day 30 deliverable?</div>
+
+          <div class="flashcard-back">A tight 5-min pitch switching between VP and engineer mode</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day29" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 29 of 30</div>
+
+    <h2>Pitch to Real Businesses</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>Why Real Pitches?</h3>
+
+      <p>Pitching in your head is fiction. Pitching to real people is reality:</p>
+
+      <p>• You'll discover objections you never anticipated</p>
+
+      <p>• You'll learn what actually resonates</p>
+
+      <p>• You'll get feedback on your pricing</p>
+
+      <p>• You'll build confidence through repetition</p>
+
+      <p>• You might even get a client</p>
+
+      <br>
+
+      <p>Nothing replaces real conversations.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>Where to Find Prospects</h3>
+
+      <p>1. <b>Your network</b> — Friends who run businesses, former colleagues</p>
+
+      <p>2. <b>Local businesses</b> — Walk into a shop, office, or restaurant</p>
+
+      <p>3. <b>Online communities</b> — LinkedIn, X, Reddit, Indie Hackers</p>
+
+      <p>4. <b>Warm intros</b> — 'Do you know anyone who struggles with X?'</p>
+
+      <p>5. <b>Cold outreach</b> — Email or DM with a specific, low-risk offer</p>
+
+      <br>
+
+      <p>Start with warm. Work to cold.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>The Outreach Message</h3>
+
+      <pre>Hi [Name],
+
+I've been building AI agents that automate [specific workflow].
+
+I'm looking for feedback from real businesses — would you be open
+to a 15-min call where I show you what I've built and get your thoughts?
+
+No cost, no commitment. Just your honest opinion.
+
+Thanks,
+Kevin</pre>
+
+      <p>Low pressure, high curiosity. Most people will say yes.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>The Feedback Loop</h3>
+
+      <p>After each pitch, document:</p>
+
+      <p>1. What objections did they raise?</p>
+
+      <p>2. What resonated most?</p>
+
+      <p>3. What did they misunderstand?</p>
+
+      <p>4. What would they pay for this?</p>
+
+      <p>5. What would they change?</p>
+
+      <br>
+
+      <p>Patterns emerge after 3-5 pitches. That's your market telling you what to build.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Find 1-3 businesses (friends, local shops, online communities). Pitch your agent. Record what they said. What surprised you? What would you change?</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What do real pitches teach you?</div>
+
+          <div class="flashcard-back">Real objections, what resonates, pricing feedback, confidence</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">Where should you start prospecting?</div>
+
+          <div class="flashcard-back">Your network — friends, former colleagues, local businesses</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the key to a good outreach message?</div>
+
+          <div class="flashcard-back">Low pressure, no commitment, ask for feedback not a sale</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What should you document after each pitch?</div>
+
+          <div class="flashcard-back">Objections, resonance, price point, change requests</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">How many pitches before patterns emerge?</div>
+
+          <div class="flashcard-back">3-5 pitches</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section" id="day30" data-week="4">
+
+  <div class="day-header">
+
+    <div class="week-label">Week 4 &middot; Day 30 of 30</div>
+
+    <h2>🎉 GRADUATION — You Are an FDE</h2>
+
+    <div class="progress">Week 4: Defend the System</div>
+
+  </div>
+
+  <div class="slides">
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 1 of 4</div>
+
+      <h3>You Are an FDE</h3>
+
+      <p>Day 30. You've done it:</p>
+
+      <p>✅ Built an agent with looping, tools, guardrails, memory, audit trail</p>
+
+      <p>✅ Made it recoverable with schemas, validation, failure handling</p>
+
+      <p>✅ Measured it with golden datasets, evals, and cost analysis</p>
+
+      <p>✅ Defended it with a full pitch, rehearsed for both audiences</p>
+
+      <p>✅ Pitched it to real businesses and got feedback</p>
+
+      <br>
+
+      <p>You've done the job before you have the title.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 2 of 4</div>
+
+      <h3>The FDE Mindset</h3>
+
+      <p>Remember what makes an FDE:</p>
+
+      <p>• Intelligence is commoditized — deployment is the edge</p>
+
+      <p>• You bridge business and technology</p>
+
+      <p>• You start with the audit, not the build</p>
+
+      <p>• You build for exceptions, not the happy path</p>
+
+      <p>• You de-risk every engagement</p>
+
+      <p>• You make stakeholders look good</p>
+
+      <br>
+
+      <p>This is who you are now.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 3 of 4</div>
+
+      <h3>Your Next 30 Days</h3>
+
+      <p>1. <b>Close your first client</b> — Even at a discount</p>
+
+      <p>2. <b>Deliver your first engagement</b> — Audit → Build → Deploy</p>
+
+      <p>3. <b>Collect your first case study</b> — Problem → Solution → Results</p>
+
+      <p>4. <b>Get your first referral</b> — Ask every happy client</p>
+
+      <p>5. <b>Raise your prices</b> — After proof, charge more</p>
+
+      <br>
+
+      <p>The first client is the hardest. Then it compounds.</p>
+
+    </div>
+
+    <div class="slide">
+
+      <div class="slide-num">Slide 4 of 4</div>
+
+      <h3>The FDE Code</h3>
+
+      <p>1. Start with the audit, not the answer</p>
+
+      <p>2. Build for exceptions, not the happy path</p>
+
+      <p>3. Measure everything in three buckets</p>
+
+      <p>4. De-risk every engagement</p>
+
+      <p>5. Make your client look good</p>
+
+      <p>6. Iterate fast, ship often</p>
+
+      <p>7. The edge is deployment, not intelligence</p>
+
+      <br>
+
+      <p>Welcome to the craft. Now go build.</p>
+
+    </div>
+
+  </div>
+
+  <div class="exercise-box">
+
+    <h4>🎙 Exercise</h4>
+
+    <p>Record a 5-min graduation speech to Kevin. Where you started, what you built, what you learned, and what you're going to do next as an FDE deployed through Finally AI.</p>
+
+  </div>
+
+  <div class="flashcards">
+
+    <h3>📇 Flashcards (5)</h3>
+
+    <div class="flashcard-grid">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What 4 things have you accomplished in 30 days?</div>
+
+          <div class="flashcard-back">Built, recovered, measured, defended an agent</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the FDE edge?</div>
+
+          <div class="flashcard-back">Deployment is the edge — intelligence is commoditized</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s your first priority after graduation?</div>
+
+          <div class="flashcard-back">Close your first client — even at a discount</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What&#39;s the hardest client to get?</div>
+
+          <div class="flashcard-back">The first one. Then it compounds.</div>
+
+        </div>
+
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+
+        <div class="flashcard-inner">
+
+          <div class="flashcard-front">What is the FDE code?</div>
+
+          <div class="flashcard-back">Audit first, build for exceptions, measure in 3 buckets, de-risk, iterate, deploy</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+<script>
+  const DAYS_DATA = {
+
+    1: {week: 1, topic: "Agent Looping - The Core Loop"},
+
+    2: {week: 1, topic: "Tool Usage - Giving Your Agent Hands"},
+
+    3: {week: 1, topic: "Guardrails - Keeping Your Agent Safe"},
+
+    4: {week: 1, topic: "Context &amp; Memory - Making Your Agent Remember"},
+
+    5: {week: 1, topic: "Audit Trail - Show Your Work"},
+
+    6: {week: 1, topic: "Real Enterprise Workflow - Pick One, Map It"},
+
+    7: {week: 1, topic: "CHECKPOINT - Working Agent Demo"},
+
+    8: {week: 2, topic: "Defined JSON Schema - No Free-Form Text"},
+
+    9: {week: 2, topic: "Schema Validation - Reject Bad Output"},
+
+    10: {week: 2, topic: "Failure Modes - Plan for the 1,000 Ways Things Go Wrong"},
+
+    11: {week: 2, topic: "Exception Handling - Build for Reality"},
+
+    12: {week: 2, topic: "Deep Dive: Client Context &amp; Exception Handling"},
+
+    13: {week: 2, topic: "Failure Handling Architecture"},
+
+    14: {week: 2, topic: "CHECKPOINT - Recoverable System"},
+
+    15: {week: 3, topic: "Retry Logic - Exponential Backoff &amp; Fallback"},
+
+    16: {week: 3, topic: "Golden Data Set - The Foundation of Eval"},
+
+    17: {week: 3, topic: "Improving Over Time - Eval-Driven Development"},
+
+    18: {week: 3, topic: "Cheaper Models for Subtasks - Route Intelligently"},
+
+    19: {week: 3, topic: "Less Frontier - Find the Right Model for the Job"},
+
+    20: {week: 3, topic: "Measurement - The Three Buckets"},
+
+    21: {week: 3, topic: "CHECKPOINT - Measurable, Economically Viable Agent"},
+
+    22: {week: 4, topic: "The Pain Points - Why AI Belongs Here"},
+
+    23: {week: 4, topic: "The Architecture - How It Works"},
+
+    24: {week: 4, topic: "Iterations - From 70% to 95%"},
+
+    25: {week: 4, topic: "The Economics - Cost, Value, Pricing"},
+
+    26: {week: 4, topic: "Rehearse as Engineer - Technical Depth"},
+
+    27: {week: 4, topic: "Rehearse as VP - Business Narrative"},
+
+    28: {week: 4, topic: "Full Pitch Practice - Engineer + VP Mode"},
+
+    29: {week: 4, topic: "Pitch to Real Businesses"},
+
+    30: {week: 4, topic: "GRADUATION - You Are an FDE"},
+
+  };
+  const COMPLETION_KEY = 'fde-review-hub-completed-chapters';
+  const START_KEY = 'fde-review-hub-start-date';
+  const JOURNAL_KEY = 'fde-review-hub-journal';
+  const BASELINE_JOURNAL_ENTRIES = {"1":{"summary":"Kevin clarified the agent loop as plan/perceive → act → review/observe → repeat, and identified completion gates including milestones, requirements, and an explicit definition of done. Open questions are how agents safely stop on token/cost, elapsed-time, or diminishing-quality thresholds; how to report success, stalemate, or blockers to a mentor; and how to map this to Python if/then logic and guardrails. Course tracking shifted from calendar days to 30 completion-based chapters, with pace status; Chapter 2 — Tool Usage — is next.","source":"telegram","date":"2026-07-22"},"2":{"summary":"The video was useful, especially its distinction between traditional and embedded tools; Kevin suspects the tools used so far are probably traditional, but wants to confirm. Successful tools used include modifying Google Docs and email in Google Drive; reading email and posting drafts to weldayenterprises@gmail.com; creating calendar events and tasks for that account; and using dedicated web-search tools. Kevin wants to distinguish skills from tools and see concrete examples of tool schemas and structured output requirements, since it is not yet clear which tools enforce them.","source":"telegram","date":"2026-07-23"},"3":{"summary":"Chapter 3 reflection — Guardrails and safe agent control.\n\nKey insight: the daily cron’s rate-limit/tool-call ceiling is a real guardrail example. It was intended to prevent runaway tool use and unnecessary credits when the skill was unoptimized or behaved unexpectedly. It is best classified as an operational/resource guardrail, not a complete safety guardrail: it limits blast radius and cost, but it does not validate inputs, restrict permissions, validate outputs, or explain the failure by itself. The useful failure mode was that it stopped the run before more credits and tool calls were consumed; the weakness was that the workflow had no explicit checkpoint guaranteeing a YouTube link or a verified final MP3 before the ceiling was reached.\n\nPriority judgment: least privilege is probably more important than input validation for consequential systems because limiting what the agent can read or change reduces damage even when the input is malicious or misunderstood. Input validation remains essential at the boundary. Output validation and auditing are also necessary: output validation prevents malformed or unsafe results from reaching downstream systems, while audit trails make decisions, tool calls, failures, and human approvals inspectable. These controls work as layers rather than substitutes.\n\nProfessional fit: Kevin has roughly 25 years of machine-control and software-engineering experience. He naturally thinks through the abnormal scenarios that most people ignore. The happy path may take about 10% of the effort; the other 90% is preventing, containing, recovering from, and learning from bad outcomes. This background appears well suited to agent-control engineering, especially translating physical machine-control discipline into permissioned, observable agent workflows.\n\nApplication direction: move from physical machine control toward agent control in a sandbox where actions can be tested safely. Red-team testing is a relevant method for deliberately probing failure and abuse cases. Air-gapping is one possible containment layer, but not the only one; sandboxing, least-privilege credentials, network egress controls, fake data, action approval gates, resettable environments, and audit logs also matter.\n\nOpen questions/uncertainties: the claim heard about a new GPT-6 escaping its sandbox is unverified and should be treated as a topic to investigate, not as established evidence. Clarify the exact threat model for agent sandbox escape and distinguish model behavior from host/container vulnerabilities.\n\nNext steps: retain the cron rate-limit incident as a case study; test the optimized chapter-delivery workflow; require a captured video URL and verified single MP3 before delivery; then study context and memory as the next control layer, including what operational incidents should be retained across sessions and what should remain transient telemetry.","source":"telegram","date":"2026-07-24"},"4":{"summary":"Kevin understands the distinction between short-term and long-term memory, but is unsure whether “context” is synonymous with short-term memory. Key insight: long-term memory can make an agent more valuable by personalizing service, but stale or conflicting facts can cause serious relationship damage. He used a Michael Scott / Dunder Mifflin example: remembering a customer’s child’s almond allergy could justify a premium service, while failing to update that fact after the child’s death could produce an insensitive and harmful interaction. Open questions: how Hermes or an agent framework should periodically review stored memories, detect stale/conflicting facts, ask the user for clarification, and support forgetting. He recalls Hermes memory options including Mem0 (possibly “mem0.com”) and Honcho, but is unsure which backend is currently active, what other options exist, and whether the current setup should be improved. Next step: clarify context vs memory and audit Hermes’s current memory provider/configuration, then formulate a client-ready explanation of the agent memory architecture.","source":"telegram","date":"2026-07-24"},"5":{"summary":"Chapter 5 reflection — Audit Trail: Client acceptance and operational efficiency depend on confidence in the workflow. When behavior is suspicious or clearly wrong, an audit trail must make the failure point visible so the work, skill, and workflow can be improved. The trail should retain only relevant, important, non-personally-identifiable information to minimize the blast radius of a breach. An effective FDE balances log verbosity against diagnostic value and information sensitivity.","source":"telegram","date":"2026-07-27"},"6":{"summary":"Chapter 6 reflection: A real workflow is more than a happy path. To earn client confidence, it needs auditing, transparency, and error detection across its decisions and handoffs. The abruptly ending lesson demonstrated the same observability requirement: a client needs proof that the delivery completed. Evidence: the prior audio audit showed a clean MP3 but no deliberate closing declaration. Open question: how should the workflow prove completion at each boundary? Next step: map the workflow with its inputs, actors, handoffs, exceptions, human controls, and measurable completion condition.","source":"telegram","date":"2026-07-27"}};
+  const COURSE_PROFILE_KEY = 'personal-tutor-course-profile';
+  const TUTOR_FOCUS_KEY = 'personal-tutor-focus';
+  const savedCourseProfile = JSON.parse(localStorage.getItem(COURSE_PROFILE_KEY) || '{}');
+  if (savedCourseProfile.title) document.getElementById('courseTitleInput').value = savedCourseProfile.title;
+  if (savedCourseProfile.subject) document.getElementById('courseSubjectInput').value = savedCourseProfile.subject;
+  document.getElementById('tutorFocus').value = localStorage.getItem(TUTOR_FOCUS_KEY) || '';
+  function saveCourseProfile() {
+    const title = document.getElementById('courseTitleInput').value.trim() || 'Personal Tutor Course';
+    const subject = document.getElementById('courseSubjectInput').value.trim() || 'General study';
+    localStorage.setItem(COURSE_PROFILE_KEY, JSON.stringify({title, subject, updated: new Date().toISOString()}));
+    document.querySelector('.header h1').textContent = title;
+    document.querySelector('.header p').textContent = subject + ' — Personal Tutor Dashboard · Slides & Flashcards';
+    document.title = title;
+  }
+  function saveTutorFocus() {
+    localStorage.setItem(TUTOR_FOCUS_KEY, document.getElementById('tutorFocus').value.trim());
+    document.getElementById('tutorFocusStatus').textContent = 'Saved for this course.';
+  }
+  function showDashboardView(view, button) {
+    document.querySelectorAll('.dashboard-bar .dashboard-btn').forEach(b => b.classList.remove('active'));
+    if (button) button.classList.add('active');
+    if (view === 'modules') document.getElementById('weekNav').scrollIntoView({behavior: 'smooth', block: 'start'});
+    if (view === 'journal') document.querySelector('.journal-panel').scrollIntoView({behavior: 'smooth', block: 'start'});
+    if (view === 'practice') {
+      const practice = document.querySelector('.section.active .flashcards') || document.querySelector('.flashcards');
+      if (practice) practice.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    if (view === 'overview') document.getElementById('dashboardPanel').scrollIntoView({behavior: 'smooth', block: 'start'});
+  }
+  if (!localStorage.getItem(START_KEY)) localStorage.setItem(START_KEY, new Date().toISOString().slice(0, 10));
+  let completedDays = new Set(JSON.parse(localStorage.getItem(COMPLETION_KEY) || localStorage.getItem('fde-review-hub-completed-days') || '[]'));
+  let journalEntries = JSON.parse(localStorage.getItem(JOURNAL_KEY) || 'null');
+  if (!journalEntries || !Object.keys(journalEntries).length) {
+    journalEntries = BASELINE_JOURNAL_ENTRIES;
+    localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
+  } else {
+    Object.keys(BASELINE_JOURNAL_ENTRIES).forEach(chapter => {
+      const existing = String(journalEntries[chapter] && journalEntries[chapter].summary || '');
+      if (!existing || /^((Baseline|Chapter) summary):/i.test(existing)) journalEntries[chapter] = BASELINE_JOURNAL_ENTRIES[chapter];
+    });
+    localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
+  }
+  function summarizeJournal(text) {
+    const clean = text.replace(/\s+/g, ' ').trim();
+    if (!clean) return '';
+    const sentences = clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [clean];
+    const summary = sentences.slice(0, 2).join(' ').trim();
+    return summary.length > 180 ? summary.slice(0, 177).trimEnd() + '...' : summary;
+  }
+  function updateJournalOverview() {
+    const list = document.getElementById('journalList');
+    list.replaceChildren();
+    const entries = Object.keys(journalEntries).map(Number).sort((a, b) => a - b);
+    if (!entries.length) {
+      const empty = document.createElement('div'); empty.className = 'journal-item';
+      const text = document.createElement('span'); text.textContent = 'No journal entries yet.';
+      empty.appendChild(text); list.appendChild(empty); return;
+    }
+    entries.forEach(chapter => {
+      const item = document.createElement('div'); item.className = 'journal-item';
+      const label = document.createElement('strong'); label.textContent = 'Chapter ' + chapter;
+      const summary = document.createElement('span'); summary.textContent = journalEntries[chapter].summary;
+      item.append(label, summary); list.appendChild(item);
+    });
+  }
+  function saveJournal(chapter, textarea, summaryNode) {
+    const summary = summarizeJournal(textarea.value);
+    if (summary) journalEntries[chapter] = { summary, updated: new Date().toISOString() };
+    else delete journalEntries[chapter];
+    localStorage.setItem(JOURNAL_KEY, JSON.stringify(journalEntries));
+    summaryNode.textContent = summary ? 'Saved summary: ' + summary : 'No entry saved yet.';
+    updateJournalOverview();
+    updatePacing();
+  }
+  function updatePacing() {
+    const count = completedDays.size;
+    const percent = Math.round((count / 30) * 100);
+    const start = new Date(localStorage.getItem(START_KEY) + 'T00:00:00');
+    const elapsed = Math.max(1, Math.min(30, Math.floor((Date.now() - start.getTime()) / 86400000) + 1));
+    const delta = count - elapsed;
+    const status = delta >= 0 ? 'On track' : 'Behind by ' + Math.abs(delta) + ' chapter' + (Math.abs(delta) === 1 ? '' : 's');
+    document.getElementById('paceLabel').textContent = count + ' of 30 chapters complete · ' + status;
+    document.getElementById('pacePercent').textContent = percent + '% · Day ' + elapsed + ' target: ' + elapsed + ' chapter' + (elapsed === 1 ? '' : 's');
+    document.getElementById('paceFill').style.width = percent + '%';
+    document.getElementById('dashboardProgress').textContent = percent + '%';
+    document.getElementById('dashboardProgressNote').textContent = count + ' of 30 chapters · ' + status;
+    const nextChapter = Array.from({length: 30}, (_, i) => i + 1).find(chapter => !completedDays.has(chapter));
+    document.getElementById('dashboardTarget').textContent = nextChapter ? 'Chapter ' + nextChapter : 'Graduation';
+    document.getElementById('dashboardTargetNote').textContent = delta >= 0 ? 'You are on pace' : 'Catch up by ' + Math.abs(delta) + ' chapter' + (Math.abs(delta) === 1 ? '' : 's');
+    document.getElementById('dashboardJournal').textContent = Object.keys(journalEntries).length;
+    document.getElementById('dashboardPractice').textContent = document.querySelectorAll('.flashcard').length;
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('completed', completedDays.has(Number(b.dataset.day))));
+    document.querySelectorAll('.complete-btn').forEach(b => {
+      const day = Number(b.dataset.day), done = completedDays.has(day);
+      b.classList.toggle('completed', done);
+      b.textContent = done ? '✓ Chapter complete — mark incomplete' : 'Mark chapter complete';
+    });
+  }
+  function toggleComplete(day) {
+    completedDays.has(day) ? completedDays.delete(day) : completedDays.add(day);
+    localStorage.setItem(COMPLETION_KEY, JSON.stringify([...completedDays].sort((a, b) => a - b)));
+    updatePacing();
+  }
+  function showWeek(week) {
+    document.querySelectorAll('.week-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === week));
+    document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', parseInt(s.dataset.week) === week));
+    document.querySelectorAll('.day-btn').forEach(b => {
+      const d = parseInt(b.dataset.day);
+      b.classList.toggle('active', DAYS_DATA[d] && DAYS_DATA[d].week === week);
+    });
+    const first = document.querySelector(`.section[data-week="${week}"]`);
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function showDay(day) {
+    const section = document.getElementById('day' + day);
+    if (!section) return;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    section.classList.add('active');
+    const week = DAYS_DATA[day].week;
+    document.querySelectorAll('.week-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === week));
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.day) === day));
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  const dayGrid = document.getElementById('dayGrid');
+  for (let d = 1; d <= 30; d++) {
+    const data = DAYS_DATA[d];
+    const btn = document.createElement('button');
+    btn.className = 'day-btn';
+    btn.dataset.day = d;
+    btn.innerHTML = '<span class="day-num">Chapter ' + d + '</span><div class="day-topic">' + data.topic + '</div>';
+    btn.onclick = function() { showDay(d); };
+    dayGrid.appendChild(btn);
+  }
+  document.querySelectorAll('.section').forEach(section => {
+    const day = Number(section.id.replace('day', ''));
+    const button = document.createElement('button');
+    button.className = 'complete-btn';
+    button.dataset.day = day;
+    button.type = 'button';
+    button.onclick = function() { toggleComplete(day); };
+    section.querySelector('.day-header').appendChild(button);
+    const journal = document.createElement('div'); journal.className = 'journal-entry';
+    const label = document.createElement('label'); label.textContent = 'Chapter journal — add your notes';
+    const textarea = document.createElement('textarea'); textarea.placeholder = 'What did you learn, build, or decide?';
+    textarea.value = journalEntries[day] ? journalEntries[day].summary : '';
+    const actions = document.createElement('div'); actions.className = 'journal-actions';
+    const save = document.createElement('button'); save.className = 'journal-save'; save.type = 'button'; save.textContent = 'Save summary';
+    const summary = document.createElement('span'); summary.className = 'journal-summary'; summary.textContent = journalEntries[day] ? 'Saved summary: ' + journalEntries[day].summary : 'No entry saved yet.';
+    save.onclick = function() { saveJournal(day, textarea, summary); };
+    actions.append(save, summary); journal.append(label, textarea, actions);
+    section.querySelector('.day-header').appendChild(journal);
+  });
+  document.querySelectorAll('.week-label').forEach(label => {
+    label.textContent = label.textContent.replace(/Day /g, 'Chapter ');
+  });
+  const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const visibleText = [];
+  while (textWalker.nextNode()) visibleText.push(textWalker.currentNode);
+  visibleText.forEach(node => {
+    if (!node.parentElement.closest('script, style')) {
+      node.nodeValue = node.nodeValue.replace(/\bDay (\d+)/g, 'Chapter $1').replace(/\bdays complete\b/g, 'chapters complete');
+    }
+  });
+  updatePacing();
+  updateJournalOverview();
+  saveCourseProfile();
+  showWeek(1);
+</script>
+</body>
+</html>
