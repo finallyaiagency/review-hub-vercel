@@ -133,6 +133,13 @@
   .exercise-box { background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(116,185,255,0.08)); border: 1px solid var(--accent); border-radius: 12px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
   .exercise-box h4 { color: var(--accent2); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
   .exercise-box p { font-size: 0.9rem; color: var(--text); }
+  .chapter-resources { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem 1rem; }
+  .chapter-resources-card { border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1rem; background: var(--surface); }
+  .chapter-resources-card h2 { font-size: 0.9rem; color: var(--accent2); margin-bottom: 0.55rem; }
+  .resource-links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .resource-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0.5rem 0.7rem; border: 1px solid var(--accent); border-radius: 7px; color: var(--accent2); background: rgba(108,92,231,0.08); font-size: 0.78rem; font-weight: 600; text-decoration: none; }
+  .resource-link:hover { background: rgba(108,92,231,0.2); color: white; }
+  .resource-note { margin-top: 0.55rem; color: var(--text2); font-size: 0.74rem; }
   @media (max-width: 600px) {
     .slides { grid-template-columns: 1fr; }
     .flashcard-grid { grid-template-columns: 1fr; }
@@ -200,6 +207,7 @@
 
 </div>
 <div class="day-grid" id="dayGrid"></div>
+<div class="chapter-resources" id="chapterResources" aria-live="polite"></div>
 <details class="journal-panel" open>
   <summary>Chapter journal overview</summary>
   <div class="journal-list" id="journalList"><div class="journal-item"><span>No journal entries yet.</span></div></div>
@@ -5709,6 +5717,7 @@ Kevin</pre>
 </div>
 
 </div>
+<script src="course-resources.js"></script>
 <script>
   const DAYS_DATA = {
 
@@ -5880,6 +5889,23 @@ Kevin</pre>
     localStorage.setItem(COMPLETION_KEY, JSON.stringify([...completedDays].sort((a, b) => a - b)));
     updatePacing();
   }
+  function renderChapterResources(day) {
+    const mount = document.getElementById('chapterResources');
+    const resource = (window.FDE_CHAPTER_RESOURCES || {})[day];
+    mount.replaceChildren();
+    if (!resource || !resource.video) return;
+    const card = document.createElement('div'); card.className = 'chapter-resources-card';
+    const heading = document.createElement('h2'); heading.textContent = 'Chapter ' + day + ' learning resources';
+    const links = document.createElement('div'); links.className = 'resource-links';
+    const video = document.createElement('a'); video.className = 'resource-link'; video.href = resource.video.url; video.target = '_blank'; video.rel = 'noopener noreferrer'; video.textContent = '📺 Watch: ' + resource.video.title;
+    links.appendChild(video);
+    if (resource.audio) {
+      const audio = document.createElement('a'); audio.className = 'resource-link'; audio.href = resource.audio.url; audio.target = '_blank'; audio.rel = 'noopener'; audio.textContent = '🎧 ' + resource.audio.title;
+      links.appendChild(audio);
+    }
+    const note = document.createElement('p'); note.className = 'resource-note'; note.textContent = resource.audio ? 'This lesson MP3 was retained and verified. Future verified lessons will appear here automatically.' : 'No retained lesson audio is available for this chapter.';
+    card.append(heading, links, note); mount.appendChild(card);
+  }
   function showWeek(week) {
     document.querySelectorAll('.week-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === week));
     document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', parseInt(s.dataset.week) === week));
@@ -5888,6 +5914,8 @@ Kevin</pre>
       b.classList.toggle('active', DAYS_DATA[d] && DAYS_DATA[d].week === week);
     });
     const first = document.querySelector(`.section[data-week="${week}"]`);
+    const firstDay = first ? Number(first.id.replace('day', '')) : 1;
+    renderChapterResources(firstDay);
     if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function showDay(day) {
@@ -5898,6 +5926,7 @@ Kevin</pre>
     const week = DAYS_DATA[day].week;
     document.querySelectorAll('.week-btn').forEach((b, i) => b.classList.toggle('active', i + 1 === week));
     document.querySelectorAll('.day-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.day) === day));
+    renderChapterResources(day);
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   const dayGrid = document.getElementById('dayGrid');
